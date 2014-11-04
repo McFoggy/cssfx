@@ -1,0 +1,13 @@
+.odd {
+/*	-fx-fill: radial-gradient( focus-angle 0.0deg, focus-distance 0.0%, center 50.0% 50.0%, radius 100.0%, rgb(153,179,255) 0.0, rgb(51,77,179) 100.0 ); */
+	-fx-fill: radial-gradient( focus-angle 0.0deg, focus-distance 0.0%, center 50.0% 50.0%, radius 100.0%, rgb(153,204,153) 0.0, rgb(51,102,51) 100.0 ); 
+}
+
+
+.even {
+	-fx-fill: radial-gradient( focus-angle 0.0deg, focus-distance 0.0%, center 50.0% 50.0%, radius 100.0%, rgb(255,153,153) 0.0, rgb(230,77,77) 100.0 );
+}
+
+.hello {
+}
+
