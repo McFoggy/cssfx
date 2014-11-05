@@ -1,7 +1,9 @@
 cssfx
 =====
 
-JavaFX tooling to edit/monitor JavaFX CSS files
+CSSFX enhances developper productivity by providing CSS reloading functionnality in your running application.
+
+While developping you can run your JavaFX application, modify some CSS sources in your prefered editor, hit save button (or CTLR+S or CMD-S) and your JavaFX application is modified in real time.
 
 ## Project coordinates
 
@@ -12,13 +14,22 @@ Maven
       <artifactId>cssfx</artifactId>
     </dependency>
 
-## 1 minute usage
+## Usages
+
+### Embedded
 
 Starting monitoring CSS changes in development is as simple as adding one line in your application code.
 
-
     CSSFX.monitor(scene).start()
 
-## Extended usage
+### Embedded with homemade configuration
+
+TODO explain uriToFile concept & usage
+
+### As an external application
+
+TODO
+
+### As a java agent
 
 TODO
