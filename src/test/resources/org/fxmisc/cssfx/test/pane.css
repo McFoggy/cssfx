@@ -1,0 +1,12 @@
+.properties {
+	/* */
+	-fx-background-color: linear-gradient( from 0.0% 0.0% to 0.0% 100.0%, rgb(51,26,128) 0.0, rgb(153,128,230) 100.0);
+	-fx-spacing: 10px;
+	-fx-padding: 0 5 0 5; 
+}
+
+.properties > .label {
+	-fx-font-size: 2em;
+	-fx-font-weight: normal;
+	-fx-text-fill: white;
+}

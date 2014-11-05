@@ -26,13 +26,19 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
@@ -99,29 +105,105 @@ public class CSSFX {
 	
 	public static class Monitors {
 		private ObservableList<Monitor> monitors = FXCollections.observableArrayList();
+		private Set<String> knownURIs = new HashSet<>();
+		private Set<Node> knownNodes = Collections.newSetFromMap(new WeakHashMap<Node, Boolean>());
+		
+        private PathsWatcher pw;
 		
 		private Monitors() {
 		}
 		
 		public Stoppable start() {
-			PathsWatcher pw = new PathsWatcher();
+			pw = new PathsWatcher();
 			
 			for (Monitor monitor : monitors) {
-				for (String uri : monitor.stylesheets()) {
-					for (Function<String, Path> uriToPath : monitor.uriToFileCreators) {
-						Path sourceFile = uriToPath.apply(uri);
-						if (sourceFile != null) {
-							Path directory = sourceFile.getParent();
-							pw.monitor(directory.toAbsolutePath().normalize(), sourceFile.toAbsolutePath().normalize(), new URIStyleUpdater(uri, sourceFile.toUri().toString(), monitor.stylesheets()));
-							continue;
-						}
-					}
-				}
+				ObservableList<String> stylesheets = monitor.stylesheets();
+				List<Function<String, Path>> uriToFileCreators = monitor.uriToFileCreators;
+				
+                
+                final ListChangeListener<String> styleSheetChangeListener = new ListChangeListener<String>() {
+                    @Override
+                    public void onChanged(javafx.collections.ListChangeListener.Change<? extends String> c) {
+                        while (c.next()) {
+                            if (c.wasAdded()) {
+                                List<? extends String> newURIs = c.getAddedSubList();
+                                for (String newURI : newURIs) {
+                                    registerURI(newURI, stylesheets, uriToFileCreators);
+                                }
+                            }
+                        }
+                    }
+                };
+                
+                monitorStylesheets(stylesheets, uriToFileCreators, styleSheetChangeListener);
+                
+
+                Parent monitorRoot = monitor.getRoot();
+                monitorParent(monitorRoot, monitor, styleSheetChangeListener);
 			}
 			
 			pw.watch();
 			return pw::stop;
 		}
+
+        private void monitorParent(Parent p, Monitor monitor, ListChangeListener<String> styleSheetChangeListener) {
+            if (p != null && !knownNodes.contains(p)) {
+                knownNodes.add(p);
+                monitorChildren(p, monitor, styleSheetChangeListener);
+            }
+        }
+
+        private void monitorStylesheets(ObservableList<String> stylesheets, List<Function<String, Path>> uriToFileCreators, final ListChangeListener<String> styleSheetChangeListener) {
+            List<String> fixedStylesheets = new LinkedList<String>(stylesheets);
+            for (String uri : fixedStylesheets) {
+                registerURI(uri, stylesheets, uriToFileCreators);
+            }
+            stylesheets.addListener(styleSheetChangeListener);
+        }
+
+        private void monitorChildren(Parent p, Monitor monitor, ListChangeListener<String> styleSheetChangeListener) {
+            monitorStylesheets(p.getStylesheets(), monitor.uriToFileCreators, styleSheetChangeListener);
+            
+            List<Node> actualChildren = new LinkedList<Node>(p.getChildrenUnmodifiable());
+            for (Node child : actualChildren) {
+                if (child instanceof Parent) {
+                    Parent childAsParent = (Parent) child;
+                    monitorParent(childAsParent, monitor, styleSheetChangeListener);
+                }
+            }
+            
+            p.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
+                @Override
+                public void onChanged(javafx.collections.ListChangeListener.Change<? extends Node> c) {
+                    while (c.next()) {
+                        if (c.wasRemoved()) {
+                            // todo un-monitor
+                        } if (c.wasAdded()) {
+                            for (Node addedNode : c.getAddedSubList()) {
+                                if (addedNode instanceof Parent) {
+                                    Parent addedParent = (Parent) addedNode;
+                                    monitorChildren(addedParent, monitor, styleSheetChangeListener);
+                                }
+                            }
+                        }                        
+                    }
+                }
+            });
+        }
+
+        private void registerURI(String uri, ObservableList<String> stylesheets, List<Function<String, Path>> uriToFileCreators) {
+            if (!knownURIs.contains(uri)) {
+                for (Function<String, Path> uriToPath : uriToFileCreators) {
+                    Path sourceFile = uriToPath.apply(uri);
+                    if (sourceFile != null) {
+                        Path directory = sourceFile.getParent();
+                        pw.monitor(directory.toAbsolutePath().normalize(), sourceFile.toAbsolutePath().normalize(), new URIStyleUpdater(uri, sourceFile.toUri().toString(), stylesheets));
+                        knownURIs.add(uri);
+                        return;
+                    }
+                }
+            }
+        }
 		
 		public ObservableList<Monitor> monitors() {
 			return monitors;
