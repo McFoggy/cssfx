@@ -99,6 +99,7 @@ public class PathsWatcher {
 				}
 			}
 		}, "CSSFX-file-monitor");
+		watcherThread.setDaemon(true);
 		watcherThread.start();
 	}
 
