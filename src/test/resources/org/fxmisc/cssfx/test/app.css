@@ -17,6 +17,29 @@
  * limitations under the License.
  * #L%
  */
-.even {
-	-fx-fill: radial-gradient( focus-angle 0.0deg, focus-distance 0.0%, center 50.0% 50.0%, radius 100.0%, rgb(255,153,153) 0.0, rgb(230,77,77) 100.0 );
+
+.root {
+	-fx-background-color: white;
+}
+
+.circle {
+    -fx-fill: yellow;
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 10 4;
+}
+
+.button-bar {
+	-fx-padding: 5 5 5 5;
+	-fx-hgap: 5;
+	-fx-border-color: darkgrey transparent transparent transparent;
+	-fx-stroke-width: 5;
+	-fx-stroke: grey;
+	-fx-background-color: linear-gradient( from 0.0% 0.0% to 0.0% 100.0%, rgb(153,153,153) 0.0, rgb(242,242,242) 50.0, rgb(153,153,153) 100.0)
+}
+
+.top {
+}
+
+.bottom {
 }

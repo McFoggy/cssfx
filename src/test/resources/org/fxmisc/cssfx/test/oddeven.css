@@ -17,14 +17,10 @@
  * limitations under the License.
  * #L%
  */
-.properties {
-	-fx-background-color: linear-gradient( from 0.0% 0.0% to 0.0% 100.0%, rgb(51,26,128) 0.0, rgb(153,128,230) 100.0);
-	-fx-spacing: 5px;
-	-fx-padding: 0 5 0 5; 
+.odd {
+	-fx-fill: radial-gradient( focus-angle 0.0deg, focus-distance 0.0%, center 50.0% 50.0%, radius 100.0%, rgb(153,204,153) 0.0, rgb(51,102,51) 100.0 ); 
 }
 
-.properties > .label {
-	-fx-font-size: 2em;
-	-fx-font-weight: bold;
-	-fx-text-fill: white;
+.even {
+	-fx-fill: radial-gradient( focus-angle 0.0deg, focus-distance 0.0%, center 50.0% 50.0%, radius 100.0%, rgb(153,179,255) 0.0, rgb(51,77,179) 100.0 ); 
 }

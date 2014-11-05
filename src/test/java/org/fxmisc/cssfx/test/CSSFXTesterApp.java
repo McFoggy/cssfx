@@ -46,21 +46,23 @@ public class CSSFXTesterApp extends Application {
 	public void start(Stage stage) throws Exception {
 	    BorderPane bp = new BorderPane();
 		
-		int prefWidth = 400;
-		int prefHeight = 300;
+		int prefWidth = 300;
+		int prefHeight = 200;
 		
 		Button btnShowBottomBar = new Button("load bottom bar");
 		btnShowBottomBar.setOnAction((ae) -> bp.setBottom(createButtonBar()));
 		Button btnLoadOddCSS = new Button("load odd.css");
 		FlowPane topBar = new FlowPane(btnShowBottomBar, btnLoadOddCSS);
 		
+		topBar.getStyleClass().addAll("button-bar", "top");
+		
 		bp.setTop(topBar);
 		bp.setCenter(buildCirclePane(prefWidth, prefHeight));
 		bp.setRight(buildPropertyPane());
 		
-		Scene s = new Scene(bp, prefWidth + 150, prefHeight + 50);
+		Scene s = new Scene(bp, 500, 350);
 
-        btnLoadOddCSS.setOnAction((ae) -> s.getStylesheets().add(getClass().getResource("odd.css").toExternalForm()));
+        btnLoadOddCSS.setOnAction((ae) -> s.getStylesheets().add(getClass().getResource("oddeven.css").toExternalForm()));
 		
 		String cssURI = getClass().getResource("app.css").toExternalForm();
 		s.getStylesheets().add(cssURI);
@@ -73,9 +75,9 @@ public class CSSFXTesterApp extends Application {
 
     private Node createButtonBar() {
         FlowPane fp = new FlowPane();
-        fp.getStyleClass().add("button-bar");
+        fp.getStyleClass().addAll("button-bar","bottom");
         fp.getChildren().addAll(new Button("Action"), new Button("Action"));
-        String buttonBarCSSUri = getClass().getResource("buttonbar.css").toExternalForm();
+        String buttonBarCSSUri = getClass().getResource("bottom.css").toExternalForm();
         fp.getStylesheets().add(buttonBarCSSUri);
         
         return fp;
@@ -100,6 +102,10 @@ public class CSSFXTesterApp extends Application {
 			c.setFill(Color.BLUE);
 			freePlacePane.getChildren().add(c);
 		}
+		
+		freePlacePane.getStyleClass().add("circles");
+		freePlacePane.prefWidth(250);
+		freePlacePane.prefWidth(200);
         return freePlacePane;
     }
 

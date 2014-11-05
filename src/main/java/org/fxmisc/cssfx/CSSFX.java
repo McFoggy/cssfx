@@ -258,7 +258,6 @@ public class CSSFX {
 		}
 		@Override
 		public void run() {
-			System.out.println("change detected on : " + sourceURI);
 			Platform.runLater(() -> {
 				cssURIs.remove(originalURI);
 				cssURIs.remove(sourceURI);

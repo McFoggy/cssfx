@@ -75,7 +75,6 @@ public class PathsWatcher {
 					for (WatchEvent<?> event : key.pollEvents()) {
 						WatchEvent.Kind<?> kind = event.kind();
 
-						System.out.println("event occured: " + kind);
 						if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
 							// it is a modification
 							@SuppressWarnings("unchecked")
@@ -83,7 +82,6 @@ public class PathsWatcher {
 							Path directory = ((Path)key.watchable()).toAbsolutePath().normalize();
 							Path modifiedFile = directory.resolve(ev.context()).toAbsolutePath().normalize();
 							
-							System.out.println("modified file: " + modifiedFile);
 							if (filesActions.containsKey(directory.toString())) {
 								Map<String, Runnable> filesAction = filesActions.get(directory.toString());
 								if (filesAction.containsKey(modifiedFile.toString())) {
