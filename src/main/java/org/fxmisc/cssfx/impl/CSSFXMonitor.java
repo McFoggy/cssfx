@@ -53,7 +53,7 @@ public class CSSFXMonitor {
     public void addAllConverters(Collection<URIToPathConverter> converters) {
         knownConverters.addAll(converters);
     }
-    
+
     public void addAllConverters(URIToPathConverter... converters) {
         knownConverters.addAll(Arrays.asList(converters));
     }
@@ -181,11 +181,15 @@ public class CSSFXMonitor {
                 }
             }
         });
+        // then look already existing children
+        for (Node node : childrenUnmodifiable) {
+            registerNode(node);
+        }
     }
 
     private void monitorStylesheets(ObservableList<String> stylesheets) {
         final URIRegistrar registrar = new URIRegistrar(knownConverters, pw);
-        
+
         // first register for changes
         stylesheets.addListener(new StyleSheetChangeListener(registrar));
 
@@ -223,19 +227,18 @@ public class CSSFXMonitor {
             listener.onEvent(e);
         }
     }
-    
+
     private static class URIRegistrar {
         final Map<String, Set<ObservableList<? extends String>>> stylesheetsContainingURI = new HashMap<>();
         final Map<String, Path> sourceURIs = new HashMap<>();
         final List<URIToPathConverter> converters;
         private PathsWatcher wp;
-        
+
         URIRegistrar(List<URIToPathConverter> c, PathsWatcher wp) {
             converters = c;
             this.wp = wp;
         }
-        
-        @SuppressWarnings("unchecked")
+
         private void register(String uri, ObservableList<? extends String> stylesheets) {
             if (!sourceURIs.containsKey(uri)) {
                 logger(CSSFXMonitor.class).debug("searching source for css[%s]", uri);
@@ -243,19 +246,20 @@ public class CSSFXMonitor {
                 // let's register this URI
                 Set<ObservableList<? extends String>> uriUsedIn = stylesheetsContainingURI.computeIfAbsent(uri, k -> new HashSet<>());
                 uriUsedIn.add(stylesheets);
-                
+
                 evaluateSourceMappingForURI(uri);
             }
         }
 
+        @SuppressWarnings("unchecked")
         private void evaluateSourceMappingForURI(String uri) {
             for (URIToPathConverter c : converters) {
                 Path sourceFile = c.convert(uri);
-                
+
                 if (sourceFile != null) {
                     logger(CSSFXMonitor.class).info("css[%s] will be mapped to source[%s]", uri, sourceFile);
                     Path directory = sourceFile.getParent();
-                    
+
                     // let's see if other mappings were not waiting for a source mapping
                     final Set<ObservableList<? extends String>> set = stylesheetsContainingURI.get(uri);
                     for (Iterator<ObservableList<? extends String>> it = set.iterator(); it.hasNext();) {
@@ -263,11 +267,8 @@ public class CSSFXMonitor {
                         if (!waitingStylesheets.contains(uri)) {
                             it.remove();
                         } else {
-                            wp.monitor(
-                                    directory.toAbsolutePath().normalize()
-                                    , sourceFile.toAbsolutePath().normalize()
-                                    , new URIStyleUpdater(uri, sourceFile.toUri().toString(), (ObservableList<String>) waitingStylesheets)
-                                    );
+                            wp.monitor(directory.toAbsolutePath().normalize(), sourceFile.toAbsolutePath().normalize(), new URIStyleUpdater(uri,
+                                    sourceFile.toUri().toString(), (ObservableList<String>) waitingStylesheets));
                         }
                     }
                     stylesheetsContainingURI.remove(uri);
@@ -279,10 +280,11 @@ public class CSSFXMonitor {
 
         private void unregister(String uri) {
         }
-        
+
         /**
          * Reevaluate not mapped uris
          */
+        @SuppressWarnings("unused")
         private void reevaluate() {
             for (String uri : stylesheetsContainingURI.keySet()) {
                 evaluateSourceMappingForURI(uri);
@@ -334,10 +336,10 @@ public class CSSFXMonitor {
         @Override
         public void run() {
             IntegerProperty positionIndex = new SimpleIntegerProperty();
-            
+
             Platform.runLater(() -> {
                 positionIndex.set(cssURIs.indexOf(originalURI));
-                if (positionIndex.get() != -1) { 
+                if (positionIndex.get() != -1) {
                     cssURIs.remove(originalURI);
                 }
                 if (positionIndex.get() == -1) {

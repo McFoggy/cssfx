@@ -38,7 +38,6 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import org.fxmisc.cssfx.CSSFX;
-import org.fxmisc.cssfx.impl.log.CSSFXLogger;
 
 public class CSSFXTesterApp extends Application {
 	@Override
@@ -75,9 +74,6 @@ public class CSSFXTesterApp extends Application {
 		s.getStylesheets().add(cssURI);
 		stage.setScene(s);
 		stage.show();
-		
-//		Stoppable monitor = CSSFX.monitor(s).start();
-//		stage.setOnCloseRequest((we) -> monitor.stop());
     }
 
     private Node createButtonBar() {
