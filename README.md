@@ -6,8 +6,11 @@ CSSFX enhances developper productivity by providing CSS reloading functionnality
 While developping you can run your JavaFX application, modify some CSS sources in your prefered editor, hit save button (or CTLR+S or CMD-S) and your JavaFX application is modified in real time.
 
 ## Project coordinates
+__Web__
 
-Maven
+http://www.fxmisc.org/cssfx
+
+__Maven__
 
     <dependency>
       <groupId>org.fxmisc.cssfx</groupId>
