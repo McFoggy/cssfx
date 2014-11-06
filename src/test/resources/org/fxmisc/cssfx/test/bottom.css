@@ -20,6 +20,9 @@
 
  
 .button {
-/* 	-fx-min-width: 100px; */ 
-/* 	-fx-min-height: 40px; */ 
+ 	-fx-min-width: 100;  
+ 	-fx-min-height: 40;
+ 	-fx-background-image: url('bullet_square_blue.png');  
+ 	-fx-background-repeat: no-repeat;  
+ 	-fx-background-position: 5 50%;  
 }

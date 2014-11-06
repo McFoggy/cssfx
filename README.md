@@ -12,6 +12,7 @@ Maven
     <dependency>
       <groupId>org.fxmisc.cssfx</groupId>
       <artifactId>cssfx</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
 ## Usages
@@ -20,7 +21,9 @@ Maven
 
 Starting monitoring CSS changes in development is as simple as adding one line in your application code.
 
-    CSSFX.monitor(scene).start()
+    CSSFX.start()
+
+Doing so CSSFX will start to track every CSS resource that will be declared on any Scene or Parent in your application. This monitoring will be active for all the Stage that your application will use.  
 
 ### Embedded with homemade configuration
 
@@ -33,3 +36,25 @@ TODO
 ### As a java agent
 
 TODO
+
+### Logging is CSSFX
+
+CSSFX comes with a mini logging framework.
+
+CSSFX support different properties to change default logging behavior
+
+| System Property | Description |
+|:----------:|:------------------|
+|`cssfx.log`|activates CSSFX logging|
+|`cssfx.log.level`|set the logging level to use, possible values `NONE ERROR WARN INFO DEBUG`, default is `INFO`|
+|`cssfx.log.type`|set the type of "appender" to use, possible values `none console jul`, default is `console` |
+
+You can also register your own LoggerFactory.
+
+```java
+CSSFXLogger.setLoggerFactory((loggerName) -> (level, message, args) -> {
+    System.out.println("I log by myself, original message: " + String.format(message, args));
+});
+```
+
+
