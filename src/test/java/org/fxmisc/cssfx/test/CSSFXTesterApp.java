@@ -38,13 +38,18 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import org.fxmisc.cssfx.CSSFX;
-import org.fxmisc.cssfx.CSSFX.Stoppable;
+import org.fxmisc.cssfx.impl.log.CSSFXLogger;
 
 public class CSSFXTesterApp extends Application {
-
 	@Override
 	public void start(Stage stage) throws Exception {
-	    BorderPane bp = new BorderPane();
+	    fillStage(stage);
+	    
+	    CSSFX.start();
+	}
+
+    private void fillStage(Stage stage) {
+        BorderPane bp = new BorderPane();
 		
 		int prefWidth = 300;
 		int prefHeight = 200;
@@ -52,7 +57,9 @@ public class CSSFXTesterApp extends Application {
 		Button btnShowBottomBar = new Button("load bottom bar");
 		btnShowBottomBar.setOnAction((ae) -> bp.setBottom(createButtonBar()));
 		Button btnLoadOddCSS = new Button("load odd.css");
-		FlowPane topBar = new FlowPane(btnShowBottomBar, btnLoadOddCSS);
+		Button btnCreateStage = new Button("create stage");
+		btnCreateStage.setOnAction(ae -> fillStage(new Stage()));
+		FlowPane topBar = new FlowPane(btnShowBottomBar, btnLoadOddCSS, btnCreateStage);
 		
 		topBar.getStyleClass().addAll("button-bar", "top");
 		
@@ -69,9 +76,9 @@ public class CSSFXTesterApp extends Application {
 		stage.setScene(s);
 		stage.show();
 		
-		Stoppable monitor = CSSFX.monitor(s).start();
-		stage.setOnCloseRequest((we) -> monitor.stop());
-	}
+//		Stoppable monitor = CSSFX.monitor(s).start();
+//		stage.setOnCloseRequest((we) -> monitor.stop());
+    }
 
     private Node createButtonBar() {
         FlowPane fp = new FlowPane();
@@ -124,5 +131,7 @@ public class CSSFXTesterApp extends Application {
 
     public static void main(String[] args) {
 		launch(args);
+		
+		
 	}
 }
