@@ -1,4 +1,4 @@
-cssfx
+cssfx [![Build Status](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx)
 =====
 
 CSSFX enhances developper productivity by providing CSS reloading functionnality in your running application.
