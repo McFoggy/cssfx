@@ -53,10 +53,10 @@ public class CSSFXTesterApp extends Application {
 		int prefWidth = 300;
 		int prefHeight = 200;
 		
-		Button btnShowBottomBar = new Button("load bottom bar");
+		Button btnShowBottomBar = new Button("Dynamic bottom bar");
 		btnShowBottomBar.setOnAction((ae) -> bp.setBottom(createButtonBar()));
-		Button btnLoadOddCSS = new Button("load odd.css");
-		Button btnCreateStage = new Button("create stage");
+		Button btnLoadOddCSS = new Button("Load additional CSS");
+		Button btnCreateStage = new Button("Create new stage");
 		btnCreateStage.setOnAction(ae -> fillStage(new Stage()));
 		FlowPane topBar = new FlowPane(btnShowBottomBar, btnLoadOddCSS, btnCreateStage);
 		
