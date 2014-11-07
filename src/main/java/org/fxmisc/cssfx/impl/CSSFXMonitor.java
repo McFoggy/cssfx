@@ -1,5 +1,26 @@
 package org.fxmisc.cssfx.impl;
 
+/*
+ * #%L
+ * CSSFX
+ * %%
+ * Copyright (C) 2014 CSSFX by Matthieu Brouillard
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+
 import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
 
 import java.nio.file.Path;
@@ -43,11 +64,24 @@ public class CSSFXMonitor {
 
     // keep insertion order
     private List<URIToPathConverter> knownConverters = new CopyOnWriteArrayList<>();
-    private final ObservableList<Stage> stages;
+    private ObservableList<Stage> stages;
+    private ObservableList<Scene> scenes;
+    private ObservableList<Node> nodes;
     private List<CSSFXEventListener> eventListeners = new CopyOnWriteArrayList<>();
 
-    public CSSFXMonitor(ObservableList<Stage> stages) {
+    public CSSFXMonitor() {
+    }
+    
+    public void setStages(ObservableList<Stage> stages) {
         this.stages = stages;
+    }
+
+    public void setScenes(ObservableList<Scene> scenes) {
+        this.scenes = scenes;
+    }
+
+    public void setNodes(ObservableList<Node> nodes) {
+        this.nodes = nodes;
     }
 
     public void addAllConverters(Collection<URIToPathConverter> converters) {
@@ -80,10 +114,20 @@ public class CSSFXMonitor {
         pw = new PathsWatcher();
 
         // start to monitor stage changes
-        monitorStages(stages);
+        if (stages != null) {
+            monitorStages(stages);
+        } else if (scenes != null) {
+            monitorScenes(scenes);
+        } else if (nodes != null) {
+            monitorChildren(nodes);
+        }
 
         pw.watch();
         logger(CSSFXMonitor.class).info("CSS Monitoring started");
+    }
+    
+    public void stop() {
+        pw.stop();
     }
 
     private void monitorStages(ObservableList<Stage> observableStages) {
@@ -160,6 +204,32 @@ public class CSSFXMonitor {
             monitorChildren(p.getChildrenUnmodifiable());
         }
         eventNotify(CSSFXEvent.newEvent(EventType.NODE_ADDED, node));
+    }
+    
+    private void monitorScenes(ObservableList<Scene> observableScenes) {
+        // first listen for changes
+        observableScenes.addListener(new ListChangeListener<Scene>() {
+            @Override
+            public void onChanged(javafx.collections.ListChangeListener.Change<? extends Scene> c) {
+                while (c.next()) {
+                    if (c.wasRemoved()) {
+                        for (Scene removedScene : c.getRemoved()) {
+                            unregisterScene(removedScene);
+                        }
+                    }
+                    if (c.wasAdded()) {
+                        for (Scene addedScene : c.getAddedSubList()) {
+                            registerScene(addedScene);
+                        }
+                    }
+                }
+            }
+        });
+        
+        // then add existing values
+        for (Scene s : observableScenes) {
+            registerScene(s);
+        }
     }
 
     private void monitorChildren(ObservableList<Node> childrenUnmodifiable) {
