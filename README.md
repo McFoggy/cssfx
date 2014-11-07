@@ -60,4 +60,6 @@ CSSFXLogger.setLoggerFactory((loggerName) -> (level, message, args) -> {
 });
 ```
 
+------------------------
+Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central.  
 
