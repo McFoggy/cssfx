@@ -5,6 +5,8 @@ CSSFX enhances developper productivity by providing CSS reloading functionnality
 
 While developping you can run your JavaFX application, modify some CSS sources in your prefered editor, hit save button (or CTLR+S or CMD-S) and your JavaFX application is modified in real time.
 
+[![CSSFX YouTube demo](http://img.youtube.com/vi/RELKg32xEWU/0.jpg)](http://www.youtube.com/watch?v=RELKg32xEWU)
+
 ## Project coordinates
 __Web__
 
