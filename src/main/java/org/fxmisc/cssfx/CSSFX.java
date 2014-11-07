@@ -128,7 +128,7 @@ public class CSSFX {
      * @param converter an additional converter to use, ignored if null
      * @return a {@link CSSFXConfig} object as a builder to allow further configuration
      */
-    public CSSFXConfig addConverter(URIToPathConverter converter) {
+    public static CSSFXConfig addConverter(URIToPathConverter converter) {
         return new CSSFXConfig().addConverter(converter);
     }
     
