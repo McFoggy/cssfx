@@ -1,4 +1,4 @@
-package org.fxmisc.cssfx.impl.events;
+package org.fxmisc.cssfx.test.ui;
 
 /*
  * #%L
@@ -21,7 +21,8 @@ package org.fxmisc.cssfx.impl.events;
  */
 
 
-@FunctionalInterface
-public interface CSSFXEventListener {
-    public void onEvent(CSSFXEvent<?> event);
+import javafx.scene.Parent;
+
+public interface TestableUI {
+    public Parent getRootNode();
 }

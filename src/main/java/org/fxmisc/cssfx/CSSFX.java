@@ -23,9 +23,12 @@ package org.fxmisc.cssfx;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import org.fxmisc.cssfx.api.URIToPathConverter;
@@ -43,18 +46,81 @@ public class CSSFX {
      * <li>detection activated on all stages of the application, including the ones that will appear later on</li>
      * </ul> 
      */
-    public static void start() {
-        new CSSFXConfig().start();
+    public static Runnable start() {
+        return new CSSFXConfig().start();
+    }
+    
+    /**
+     * Directly start monitoring CSS for the given Stage.
+     * <ul>
+     * <li>standard source file detectors: Maven, Gradle, execution from built JAR (details in {@link URIToPathConverters#DEFAULT_CONVERTERS})</li>
+     * <li>detection activated on the stage only (and its children)</li>
+     * </ul> 
+     */
+    public static Runnable start(Stage s) {
+        CSSFXConfig cfg = new CSSFXConfig();
+        cfg.setRestrictedToStage(s);
+        return cfg.start();
+    }
+    
+    /**
+     * Directly start monitoring CSS for the given Scene.
+     * <ul>
+     * <li>standard source file detectors: Maven, Gradle, execution from built JAR (details in {@link URIToPathConverters#DEFAULT_CONVERTERS})</li>
+     * <li>detection activated on the scene only (and its children)</li>
+     * </ul> 
+     */
+    public static Runnable start(Scene s) {
+        CSSFXConfig cfg = new CSSFXConfig();
+        cfg.setRestrictedToScene(s);
+        return cfg.start();
+    }
+    
+    /**
+     * Directly start monitoring CSS for the given node.
+     * <ul>
+     * <li>standard source file detectors: Maven, Gradle, execution from built JAR (details in {@link URIToPathConverters#DEFAULT_CONVERTERS})</li>
+     * <li>detection activated on the node only (and its children)</li>
+     * </ul> 
+     */
+    public static Runnable start(Node n) {
+        CSSFXConfig cfg = new CSSFXConfig();
+        cfg.setRestrictedToNode(n);
+        return cfg.start();
     }
 
     /**
      * Restrict the source file detection for graphical sub-tree of the given {@link Stage}
      * 
-     * @param s the stage to restrict the detection on, if null thne no restriction will apply
+     * @param s the stage to restrict the detection on, if null then no restriction will apply
      * @return a {@link CSSFXConfig} object as a builder to allow further configuration
      */
-    public CSSFXConfig onlyFor(Stage s) {
-        return new CSSFXConfig(s);
+    public static CSSFXConfig onlyFor(Stage s) {
+        CSSFXConfig cfg = new CSSFXConfig();
+        cfg.setRestrictedToStage(s);
+        return cfg;
+    }
+    /**
+     * Restrict the source file detection for graphical sub-tree of the given {@link Scene}
+     * 
+     * @param s the scene to restrict the detection on, if null then no restriction will apply
+     * @return a {@link CSSFXConfig} object as a builder to allow further configuration
+     */
+    public static CSSFXConfig onlyFor(Scene s) {
+        CSSFXConfig cfg = new CSSFXConfig();
+        cfg.setRestrictedToScene(s);
+        return cfg;
+    }
+    /**
+     * Restrict the source file detection for graphical sub-tree of the given {@link Node}
+     * 
+     * @param n the node to restrict the detection on, if null then no restriction will apply
+     * @return a {@link CSSFXConfig} object as a builder to allow further configuration
+     */
+    public static CSSFXConfig onlyFor(Node n) {
+        CSSFXConfig cfg = new CSSFXConfig();
+        cfg.setRestrictedToNode(n);
+        return cfg;
     }
 
     /**
@@ -74,13 +140,33 @@ public class CSSFX {
     public static class CSSFXConfig {
         // LinkedHashSet will preserve ordering
         private final Set<URIToPathConverter> converters = new LinkedHashSet<URIToPathConverter>(Arrays.asList(URIToPathConverters.DEFAULT_CONVERTERS));
-        private final Stage restrictedToStage;
+        private Stage restrictedToStage = null;
+        private Scene restrictedToScene = null;
+        private Node restrictedToNode = null;
         
         CSSFXConfig() {
-            restrictedToStage = null;
         }
-        CSSFXConfig(Stage s) {
-            this.restrictedToStage = s;
+
+        void setRestrictedToStage(Stage restrictedToStage) {
+            this.restrictedToStage = restrictedToStage;
+        }
+
+        void setRestrictedToScene(Scene restrictedToScene) {
+            this.restrictedToScene = restrictedToScene;
+        }
+
+        void setRestrictedToNode(Node restrictedToNode) {
+            this.restrictedToNode = restrictedToNode;
+        }
+        
+        /**
+         * Empty the list of default converters.
+         * Especially usefull for testing purposes where full control of the converters is required.
+         * @return a {@link CSSFXConfig} object as a builder to allow further configuration
+         */
+        public CSSFXConfig noDefaultConverters() {
+            converters.clear();
+            return this;
         }
 
         /**
@@ -96,7 +182,7 @@ public class CSSFX {
         /**
          * Start monitoring CSS resources with the config parameters collected until now. 
          */
-        public void start() {
+        public Runnable start() {
             if (!CSSFXLogger.isInitialized()) {
                 if (Boolean.getBoolean("cssfx.log")) {
                     LogLevel toActivate = LogLevel.INFO;
@@ -126,13 +212,35 @@ public class CSSFX {
                 } else {
                     CSSFXLogger.noop();
                 }
-                
             }
+            
+            CSSFXMonitor m = new CSSFXMonitor();
+            
+            if (restrictedToStage != null) {
+                m.setStages(FXCollections.singletonObservableList(restrictedToStage));
+            } else if (restrictedToScene != null) {
+                m.setScenes(FXCollections.singletonObservableList(restrictedToScene));
+            } else if (restrictedToNode != null) {
+                m.setNodes(FXCollections.singletonObservableList(restrictedToNode));
+            } else {
+                // we monitor all the stages
+                ObservableList<Stage> monitoredStages = (restrictedToStage == null)?ApplicationStages.monitoredStages():FXCollections.singletonObservableList(restrictedToStage);
+                m.setStages(monitoredStages);
+            }
+            
+            return start(() -> m);
+        }
 
-            final ObservableList<Stage> monitoredStages = (restrictedToStage == null)?ApplicationStages.monitoredStages():FXCollections.singletonObservableList(restrictedToStage);
-            CSSFXMonitor mon = new CSSFXMonitor(monitoredStages);
-            mon.addAllConverters(converters);
-            mon.start();
+        private Runnable start(Callable<CSSFXMonitor> monitorBuilder) {
+            CSSFXMonitor mon;
+            try {
+                mon = monitorBuilder.call();
+                mon.addAllConverters(converters);
+                mon.start();
+                return mon::stop;
+            } catch (Exception e) {
+                throw new RuntimeException("could not create CSSFXMonitor", e);
+            }
         }
     }
 }

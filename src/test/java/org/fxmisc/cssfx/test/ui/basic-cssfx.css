@@ -1,5 +1,3 @@
-package org.fxmisc.cssfx.impl.events;
-
 /*
  * #%L
  * CSSFX
@@ -19,9 +17,6 @@ package org.fxmisc.cssfx.impl.events;
  * limitations under the License.
  * #L%
  */
-
-
-@FunctionalInterface
-public interface CSSFXEventListener {
-    public void onEvent(CSSFXEvent<?> event);
+.label {
+	-fx-text-fill: blue;
 }
