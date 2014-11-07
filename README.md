@@ -73,7 +73,7 @@ CSSFX.addConverter(myConverter).start();
 
 ### Embedded with homemade configuration
 
-If you need more control on how CSSFX will monitor your application & CSS changes, then you can using some extended functionalities of the `CSSFX` builder class.
+If you need more control on how CSSFX will monitor your application & CSS changes, then you can use some extended functionalities of the `CSSFX` builder class.
 
 There you will be able to:
 
@@ -91,11 +91,11 @@ TODO
 
 TODO
 
-### Logging is CSSFX
+### Logging in CSSFX
 
 CSSFX comes with a mini logging framework.
 
-CSSFX support different properties to change default logging behavior
+CSSFX supports different properties to change default logging behavior
 
 | System Property | Description |
 |:----------:|:------------------|
@@ -116,7 +116,7 @@ CSSFXLogger.setLoggerFactory((loggerName) -> (level, message, args) -> {
 | Branch type | Status |
 |:-----------:|:------------------|
 | master|[![Build Status Main](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx)|
-| latest commit|[![Build Status Main](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx)|
+| latest commit|[![Build Status Latest](https://travis-ci.org/McFoggy/cssfx.svg)](https://travis-ci.org/McFoggy/cssfx)|
 
 ------------------------
 Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central.  
