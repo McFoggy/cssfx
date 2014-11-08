@@ -45,6 +45,7 @@ public class CSSFX {
      * <li>standard source file detectors: Maven, Gradle, execution from built JAR (details in {@link URIToPathConverters#DEFAULT_CONVERTERS})</li>
      * <li>detection activated on all stages of the application, including the ones that will appear later on</li>
      * </ul> 
+     * @return a Runnable object to stop CSSFX monitoring
      */
     public static Runnable start() {
         return new CSSFXConfig().start();
@@ -56,10 +57,12 @@ public class CSSFX {
      * <li>standard source file detectors: Maven, Gradle, execution from built JAR (details in {@link URIToPathConverters#DEFAULT_CONVERTERS})</li>
      * <li>detection activated on the stage only (and its children)</li>
      * </ul> 
+     * @param stage the stage that will be monitored
+     * @return a Runnable object to stop CSSFX monitoring
      */
-    public static Runnable start(Stage s) {
+    public static Runnable start(Stage stage) {
         CSSFXConfig cfg = new CSSFXConfig();
-        cfg.setRestrictedToStage(s);
+        cfg.setRestrictedToStage(stage);
         return cfg.start();
     }
     
@@ -69,10 +72,12 @@ public class CSSFX {
      * <li>standard source file detectors: Maven, Gradle, execution from built JAR (details in {@link URIToPathConverters#DEFAULT_CONVERTERS})</li>
      * <li>detection activated on the scene only (and its children)</li>
      * </ul> 
+     * @param scene the scene that will be monitored
+     * @return a Runnable object to stop CSSFX monitoring
      */
-    public static Runnable start(Scene s) {
+    public static Runnable start(Scene scene) {
         CSSFXConfig cfg = new CSSFXConfig();
-        cfg.setRestrictedToScene(s);
+        cfg.setRestrictedToScene(scene);
         return cfg.start();
     }
     
@@ -82,10 +87,12 @@ public class CSSFX {
      * <li>standard source file detectors: Maven, Gradle, execution from built JAR (details in {@link URIToPathConverters#DEFAULT_CONVERTERS})</li>
      * <li>detection activated on the node only (and its children)</li>
      * </ul> 
+     * @param node the node that will be monitored
+     * @return a Runnable object to stop CSSFX monitoring
      */
-    public static Runnable start(Node n) {
+    public static Runnable start(Node node) {
         CSSFXConfig cfg = new CSSFXConfig();
-        cfg.setRestrictedToNode(n);
+        cfg.setRestrictedToNode(node);
         return cfg.start();
     }
 
@@ -181,6 +188,7 @@ public class CSSFX {
         
         /**
          * Start monitoring CSS resources with the config parameters collected until now. 
+         * @return a Runnable object to stop CSSFX monitoring
          */
         public Runnable start() {
             if (!CSSFXLogger.isInitialized()) {
