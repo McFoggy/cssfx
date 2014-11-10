@@ -111,12 +111,13 @@ CSSFXLogger.setLoggerFactory((loggerName) -> (level, message, args) -> {
 });
 ```
 
-### Build statuses
+### Badges
 
-| Branch type | Status |
+| Badge type | Badge |
 |:-----------:|:------------------|
-| master|[![Build Status Main](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx)|
-| latest commit|[![Build Status Latest](https://travis-ci.org/McFoggy/cssfx.svg)](https://travis-ci.org/McFoggy/cssfx)|
+| build on master|[![Build Status Main](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx)|
+| build latest commit|[![Build Status Latest](https://travis-ci.org/McFoggy/cssfx.svg)](https://travis-ci.org/McFoggy/cssfx)|
+| maven latest | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.cssfx/cssfx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.cssfx/cssfx)|
 
 ------------------------
 Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central.  
