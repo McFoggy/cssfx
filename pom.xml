@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.fxmisc.cssfx</groupId>
     <artifactId>cssfx</artifactId>
-    <version>1.0.0-rc01</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>CSSFX</name>
     <url>http://www.fxmisc.org/cssfx</url>
@@ -26,7 +26,7 @@
         <url>https://github.com/mcfoggy/cssfx</url>
         <connection>scm:git:git://github.com/mcfoggy/cssfx.git</connection>
         <developerConnection>scm:git:git@github.com/mcfoggy/cssfx.git</developerConnection>
-        <tag>v1.0.0-rc01</tag>
+        <tag>v1.0.0</tag>
     </scm>
 
     <organization>
