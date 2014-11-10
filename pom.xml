@@ -64,6 +64,13 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
+                        <manifestEntries>
+                            <Main-Class>org.fxmisc.cssfx.impl.ui.CSSFXApplication</Main-Class>
+                            <Premain-Class>org.fxmisc.cssfx.impl.agent.CSSFXAgent</Premain-Class>
+                            <Agent-Class>org.fxmisc.cssfx.impl.agent.CSSFXAgent</Agent-Class>
+                            <Can-Redefine-Classes>false</Can-Redefine-Classes>
+                            <Can-Retransform-Classes>false</Can-Retransform-Classes>
+                        </manifestEntries>
                     </archive>
                 </configuration>
                 <executions>
@@ -172,6 +179,13 @@
             <artifactId>testFx</artifactId>
             <version>3.1.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+            <version>1.8.0</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
     </dependencies>
 
