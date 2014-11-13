@@ -59,7 +59,7 @@ import org.fxmisc.cssfx.impl.monitoring.PathsWatcher;
  *   
  * @author Matthieu Brouillard
  */
-public class CSSFXMonitor {
+public class CSSFXMonitor implements CSSFXEventNotifer {
     private PathsWatcher pw;
 
     // keep insertion order
@@ -112,7 +112,8 @@ public class CSSFXMonitor {
         logger(CSSFXMonitor.class).info("CSS Monitoring is about to start");
 
         pw = new PathsWatcher();
-
+        registrar = new URIRegistrar(knownConverters, pw, this);
+        
         // start to monitor stage changes
         if (stages != null) {
             monitorStages(stages);
@@ -258,8 +259,6 @@ public class CSSFXMonitor {
     }
 
     private void monitorStylesheets(ObservableList<String> stylesheets) {
-        final URIRegistrar registrar = new URIRegistrar(knownConverters, pw);
-
         // first register for changes
         stylesheets.addListener(new StyleSheetChangeListener(registrar));
 
@@ -292,7 +291,11 @@ public class CSSFXMonitor {
         eventNotify(CSSFXEvent.newEvent(EventType.STAGE_REMOVED, removedStage));
     }
 
-    private void eventNotify(CSSFXEvent<?> e) {
+    /* (non-Javadoc)
+     * @see org.fxmisc.cssfx.impl.CSSFXEventNotifer#eventNotify(org.fxmisc.cssfx.impl.events.CSSFXEvent)
+     */
+    @Override
+    public void eventNotify(CSSFXEvent<?> e) {
         for (CSSFXEventListener listener : eventListeners) {
             listener.onEvent(e);
         }
@@ -303,10 +306,12 @@ public class CSSFXMonitor {
         final Map<String, Path> sourceURIs = new HashMap<>();
         final List<URIToPathConverter> converters;
         private PathsWatcher wp;
+        private CSSFXEventNotifer notifier;
 
-        URIRegistrar(List<URIToPathConverter> c, PathsWatcher wp) {
+        URIRegistrar(List<URIToPathConverter> c, PathsWatcher wp, CSSFXEventNotifer notifier) {
             converters = c;
             this.wp = wp;
+            this.notifier = notifier;
         }
 
         private void register(String uri, ObservableList<? extends String> stylesheets) {
@@ -343,6 +348,8 @@ public class CSSFXMonitor {
                     }
                     stylesheetsContainingURI.remove(uri);
                     sourceURIs.put(sourceFile.toUri().toString(), sourceFile);
+                    
+                    notifier.eventNotify(CSSFXEvent.newEvent(EventType.STYLESHEET_REPLACED, String.join("#", uri, sourceFile.toUri().toString())));
                     break;
                 }
             }
@@ -391,6 +398,8 @@ public class CSSFXMonitor {
         public void onChanged(javafx.collections.ListChangeListener.Change<? extends String> c) {
         }
     };
+
+    private URIRegistrar registrar;
 
     private static class URIStyleUpdater implements Runnable {
         private final String sourceURI;

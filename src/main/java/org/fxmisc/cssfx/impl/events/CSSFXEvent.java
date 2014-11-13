@@ -34,6 +34,7 @@ public final class CSSFXEvent<T> {
         , SCENE_REMOVED
         , STAGE_ADDED
         , STAGE_REMOVED
+        , STYLESHEET_REPLACED
     }
     
     private  CSSFXEvent(EventType type, T data) {
