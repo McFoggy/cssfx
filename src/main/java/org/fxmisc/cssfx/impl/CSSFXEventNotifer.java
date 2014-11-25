@@ -1,6 +1,6 @@
 package org.fxmisc.cssfx.impl;
 
-import org.fxmisc.cssfx.impl.events.CSSFXEvent;
+import org.fxmisc.cssfx.api.CSSFXEvent;
 
 public interface CSSFXEventNotifer {
 

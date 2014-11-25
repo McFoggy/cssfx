@@ -34,7 +34,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
-import org.fxmisc.cssfx.CSSFX;
 import org.fxmisc.cssfx.test.ui.TestableUI;
 
 public class CSSFXTesterApp extends Application implements TestableUI {
@@ -44,7 +43,12 @@ public class CSSFXTesterApp extends Application implements TestableUI {
     public void start(Stage stage) throws Exception {
         fillStage(stage);
         stage.show();
-        CSSFX.start();
+//        CSSFX.listening(new CSSFXEventListener() {
+//            @Override
+//            public void onEvent(CSSFXEvent<?> event) {
+//                CSSFXLogger.logger(CSSFXTesterApp.class).info("event [%s] received, data: %s", event.getEventType(), event.getEventData());
+//            }
+//        }).start();
     }
 
     public void initUI(Stage stage) {

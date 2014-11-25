@@ -23,7 +23,7 @@
 }
 
 .circle {
-    -fx-fill: yellow;
+    -fx-fill: red;
     -fx-stroke: black;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 10 4;
