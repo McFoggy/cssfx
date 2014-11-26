@@ -21,8 +21,6 @@ package org.fxmisc.cssfx.impl;
  */
 
 
-import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
-
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Stream;
-
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -50,12 +46,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-
 import org.fxmisc.cssfx.api.CSSFXEvent;
+import org.fxmisc.cssfx.api.CSSFXEvent.EventType;
 import org.fxmisc.cssfx.api.CSSFXEventListener;
 import org.fxmisc.cssfx.api.MonitoredStylesheet;
 import org.fxmisc.cssfx.api.URIToPathConverter;
-import org.fxmisc.cssfx.api.CSSFXEvent.EventType;
+import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
 import org.fxmisc.cssfx.impl.monitoring.PathsWatcher;
 
 /**
@@ -136,9 +132,9 @@ public class CSSFXMonitor implements CSSFXEventNotifer {
         
         // start to monitor stage changes
         if (windows != null) {
-            monitorStages(windows);
+            monitorWindows(windows);
         } else if (stages != null) {
-            monitorStages(stages);
+            monitorWindows(stages);
         } else if (scenes != null) {
             monitorScenes(scenes);
         } else if (nodes != null) {
@@ -153,20 +149,20 @@ public class CSSFXMonitor implements CSSFXEventNotifer {
         pw.stop();
     }
 
-    private void monitorStages(ObservableList<? extends Window> observableStages) {
+    private void monitorWindows(ObservableList<? extends Window> observableWindows) {
         // first listen for changes
-        observableStages.addListener(new ListChangeListener<Window>() {
+        observableWindows.addListener(new ListChangeListener<Window>() {
             @Override
             public void onChanged(javafx.collections.ListChangeListener.Change<? extends Window> c) {
                 while (c.next()) {
                     if (c.wasRemoved()) {
-                        for (Window removedStage : c.getRemoved()) {
-                            unregisterStage(removedStage);
+                        for (Window removedWindow : c.getRemoved()) {
+                            unregisterWindow(removedWindow);
                         }
                     }
                     if (c.wasAdded()) {
-                        for (Window addedStage : c.getAddedSubList()) {
-                            registerStage(addedStage);
+                        for (Window addedWindow : c.getAddedSubList()) {
+                            registerWindow(addedWindow);
                         }
                     }
                 }
@@ -174,10 +170,9 @@ public class CSSFXMonitor implements CSSFXEventNotifer {
         });
 
         // then process already existing stages
-        for (Window stage : observableStages) {
-            registerStage(stage);
+        for (Window stage : observableWindows) {
+            registerWindow(stage);
         }
-
     }
 
     private void monitorStageScene(ReadOnlyObjectProperty<Scene> stageSceneProperty) {
@@ -304,12 +299,12 @@ public class CSSFXMonitor implements CSSFXEventNotifer {
         eventNotify(CSSFXEvent.newEvent(EventType.SCENE_REMOVED, removedScene));
     }
 
-    private void registerStage(Window stage) {
+    private void registerWindow(Window stage) {
         eventNotify(CSSFXEvent.newEvent(EventType.STAGE_ADDED, stage));
         monitorStageScene(stage.sceneProperty());
     }
 
-    private void unregisterStage(Window removedStage) {
+    private void unregisterWindow(Window removedStage) {
         if (removedStage.getScene() != null) {
             eventNotify(CSSFXEvent.newEvent(EventType.SCENE_REMOVED, removedStage.getScene()));
         }
