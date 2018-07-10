@@ -35,9 +35,8 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import org.fxmisc.cssfx.CSSFX;
-import org.fxmisc.cssfx.test.ui.TestableUI;
 
-public class CSSFXTesterApp extends Application implements TestableUI {
+public class CSSFXTesterApp extends Application {
     private Button btnLoadOddCSS;   // needed as field for tests purposes
 
     @Override
@@ -57,7 +56,7 @@ public class CSSFXTesterApp extends Application implements TestableUI {
     }
 
     private void fillStage(Stage stage) {
-        Parent p = getRootNode();
+        Parent p = buildUI();
         Scene scene = new Scene(p, 500, 350);
         stage.setScene(scene);
 
@@ -104,8 +103,7 @@ public class CSSFXTesterApp extends Application implements TestableUI {
         launch(args);
     }
 
-    @Override
-    public Parent getRootNode() {
+    public Parent buildUI() {
         BorderPane bp = new BorderPane();
 
         int prefWidth = 300;

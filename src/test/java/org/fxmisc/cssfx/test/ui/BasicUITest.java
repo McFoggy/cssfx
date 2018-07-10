@@ -21,9 +21,15 @@ package org.fxmisc.cssfx.test.ui;
  */
 
 
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import org.fxmisc.cssfx.CSSFX;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.api.FxRobot;
+import org.testfx.framework.junit5.ApplicationExtension;
+import org.testfx.framework.junit5.Start;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -31,31 +37,42 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.fxmisc.cssfx.CSSFX;
-import org.junit.Test;
+@ExtendWith(ApplicationExtension.class)
+public class BasicUITest {
+    private BasicUI basicUI;
 
+    @Start
+    public void init(Stage stage) throws Exception {
+        basicUI = new BasicUI();
+        basicUI.start(stage);
+    }
 
-public class BasicUITest extends AbstractTestableGUITest {
-    public BasicUITest() {
-        super(BasicUI.class);
+    @Test
+    public void canRetrieveExpectedNodes(FxRobot robot) {
+        Runnable stopper = basicUI.startCSSFX();
+        try {
+            assertThat(robot.lookup(".label").queryAll().size(), is(2));
+        } finally {
+            stopper.run();
+        }
     }
     
     @Test
-    public void canRetrieveExpectedNodes() {
-        assertThat(findAll(".label").size(), is(2));
+    public void checkCSSIsApplied(FxRobot robot) {
+        Runnable stopper = basicUI.startCSSFX();
+        try {
+            Label cssfxLabel = robot.lookup("#cssfx").queryAs(Label.class);
+            assertThat(cssfxLabel.getTextFill(), is(Color.WHITE));
+        } finally {
+            stopper.run();
+        }
     }
     
     @Test
-    public void checkCSSIsApplied() {
-        Label cssfxLabel = find("#cssfx");
-        assertThat(cssfxLabel.getTextFill(), is(Color.WHITE));
-    }
-    
-    @Test
-    public void checkCSSFXCanChangeTheLabelFontColor() throws Exception {
+    public void checkCSSFXCanChangeTheLabelFontColor(FxRobot robot) throws Exception {
         // The CSS used by the UI
         URI basicCSS = BasicUI.class.getResource("basic.css").toURI();
         String basicCSSUrl = basicCSS.toURL().toExternalForm();
@@ -71,7 +88,7 @@ public class BasicUITest extends AbstractTestableGUITest {
         URI changedBasicCSS = BasicUI.class.getResource("basic-cssfx.css").toURI();
         
         // start CSSFX
-        Runnable stopper = CSSFX.onlyFor(builtRootNode())
+        Runnable stopper = CSSFX.onlyFor(basicUI.getRootNode())
                 .noDefaultConverters()
                 .addConverter((uri) -> {
                     if (basicCSSUrl.equals(uri)) {
@@ -85,9 +102,9 @@ public class BasicUITest extends AbstractTestableGUITest {
 
             // We need to let CSSFX some time to detect the file change
             // TODO check if waiting is really needed
-            sleep(100);
-            
-            Label cssfxLabel = find("#cssfx");
+            Thread.sleep(2000);
+
+            Label cssfxLabel = robot.lookup("#cssfx").queryAs(Label.class);
             assertThat(cssfxLabel.getTextFill(), is(Color.BLUE));
         } finally {
             stopper.run();

@@ -21,29 +21,25 @@ package org.fxmisc.cssfx.test;
  */
 
 
-import org.fxmisc.cssfx.test.ui.AbstractTestableGUITest;
-import org.junit.Before;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import javafx.stage.Stage;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.api.FxRobot;
+import org.testfx.framework.junit5.ApplicationExtension;
+import org.testfx.framework.junit5.Start;
 
-public class CSSFXTesterAppTest extends AbstractTestableGUITest<CSSFXTesterApp> {
-    public CSSFXTesterAppTest() {
-        super(CSSFXTesterApp.class);
-    }
-    
-    @Before
-    public void init() throws Exception {
-        if (stage != null) {
-            FXTestUtils.invokeAndWait(() -> getTestedInstance().initUI(stage), 5);
-        }
+@ExtendWith(ApplicationExtension.class)
+public class CSSFXTesterAppTest {
+
+    @Start
+    public void init(Stage stage) throws Exception {
+        new CSSFXTesterApp().start(stage);
     }
     
     @Test
-    public void canLoadTheApplication() {
-        click("#dynamicBar");
-        click("#dynamicCSS");
-        click("#dynamicStage");
-        
-        sleep(100);
+    public void canLoadTheApplication(FxRobot robot) {
+        robot.clickOn("#dynamicBar");
+        robot.clickOn("#dynamicCSS");
+        robot.clickOn("#dynamicStage");
     }
 }
