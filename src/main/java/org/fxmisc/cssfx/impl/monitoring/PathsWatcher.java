@@ -20,6 +20,8 @@ package org.fxmisc.cssfx.impl.monitoring;
  * #L%
  */
 
+import com.sun.nio.file.SensitivityWatchEventModifier;
+
 import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
 
 import java.io.IOException;
@@ -53,7 +55,7 @@ public class PathsWatcher {
             Map<String, List<Runnable>> fileAction = filesActions.computeIfAbsent(
                     directory.toString(), (p) -> {
                         try {
-                            directory.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+                            directory.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, SensitivityWatchEventModifier.HIGH);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
