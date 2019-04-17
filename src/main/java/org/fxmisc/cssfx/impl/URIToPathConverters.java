@@ -78,11 +78,11 @@ public class URIToPathConverters {
         @Override
         public Path convert(String uri) {
             if (uri != null && uri.startsWith("file:")) {
-                if (uri.contains("build/classes/main")) {
+                if (uri.contains("build/resources/main")) {
                     String[] classesTransform = {
                             "src/main/java", "src/main/resources" };
                     for (String ct : classesTransform) {
-                        String potentialSourceURI = uri.replace("target/classes", ct);
+                        String potentialSourceURI = uri.replace("build/resources/main", ct);
                         try {
                             Path p = Paths.get(new URI(potentialSourceURI));
                             if (Files.exists(p)) {
@@ -92,11 +92,11 @@ public class URIToPathConverters {
                             e.printStackTrace();
                         }
                     }
-                } else if (uri.contains("build/classes/test")) {
+                } else if (uri.contains("build/resources/test")) {
                     String[] testClassesTransform = {
                             "src/test/java", "src/test/resources" };
                     for (String tct : testClassesTransform) {
-                        String potentialSourceURI = uri.replace("target/test-classes", tct);
+                        String potentialSourceURI = uri.replace("build/resources/test", tct);
                         try {
                             Path p = Paths.get(new URI(potentialSourceURI));
                             if (Files.exists(p)) {
@@ -113,6 +113,7 @@ public class URIToPathConverters {
             return null;
         }
     };
+
 
     private static Pattern[] JAR_PATTERNS = {
             Pattern.compile("jar:file:/(.*)/target/(.*)\\.jar!/(.*\\.css)") // resource from maven jar in target directory
