@@ -115,6 +115,47 @@ public class URIToPathConverters {
     };
 
 
+    private static final URIToPathConverter INTELLIJ_RESOURCE = new URIToPathConverter() {
+        @Override
+        public Path convert(String uri) {
+            if (uri != null && uri.startsWith("file:")) {
+                if (uri.contains("out/production/resources")) {
+                    String[] classesTransform = {
+                            "src/main/java", "src/main/resources" };
+                    for (String ct : classesTransform) {
+                        String potentialSourceURI = uri.replace("out/production/resources", ct);
+                        try {
+                            Path p = Paths.get(new URI(potentialSourceURI));
+                            if (Files.exists(p)) {
+                                return p;
+                            }
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else if (uri.contains("out/test/resources")) {
+                    String[] testClassesTransform = {
+                            "src/test/java", "src/test/resources" };
+                    for (String tct : testClassesTransform) {
+                        String potentialSourceURI = uri.replace("out/test/resources", tct);
+                        try {
+                            Path p = Paths.get(new URI(potentialSourceURI));
+                            if (Files.exists(p)) {
+                                return p;
+                            }
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            logger(URIToPathConverters.class).debug("GRADLE converter failed to map css[%s] to a source file", uri);
+            return null;
+        }
+    };
+
+
     private static Pattern[] JAR_PATTERNS = {
             Pattern.compile("jar:file:/(.*)/target/(.*)\\.jar!/(.*\\.css)") // resource from maven jar in target directory
             , Pattern.compile("jar:file:/(.*)/build/(.*)\\.jar!/(.*\\.css)") // resource from gradle jar in target directory
@@ -152,5 +193,6 @@ public class URIToPathConverters {
             MAVEN_RESOURCE
             , GRADLE_RESOURCE
             , JAR_RESOURCE
+            , INTELLIJ_RESOURCE
     };
 }
