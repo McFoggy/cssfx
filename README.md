@@ -17,7 +17,7 @@ __Maven__
     <dependency>
       <groupId>org.fxmisc.cssfx</groupId>
       <artifactId>cssfx</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
     </dependency>
 
 ## Usages
