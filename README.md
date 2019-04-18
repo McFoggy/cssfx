@@ -1,5 +1,6 @@
-cssfx [![Build Status](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx)
+cssfx
 =====
+[![Build Status](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.cssfx/cssfx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.cssfx/cssfx) [![Open Hub project report for CSSFX](https://www.openhub.net/p/cssfx/widgets/project_thin_badge.gif)](https://www.openhub.net/p/cssfx?ref=sample)
 
 CSSFX enhances developper productivity by providing CSS reloading functionnality in your running application.
 
@@ -8,17 +9,50 @@ While developping you can run your JavaFX application, modify some CSS sources i
 [![CSSFX YouTube demo](http://img.youtube.com/vi/RELKg32xEWU/0.jpg)](http://www.youtube.com/watch?v=RELKg32xEWU)
 
 ## Project coordinates
-__Web__
 
-http://www.fxmisc.org/cssfx
+## Java >= 11
+
+Versions compatible with JavaFX 11 start with `11.X` (see [latest on central](https://search.maven.org/search?q=g:org.fxmisc.cssfx%20AND%20a:cssfx))
 
 __Maven__
 
-    <dependency>
-      <groupId>org.fxmisc.cssfx</groupId>
-      <artifactId>cssfx</artifactId>
-      <version>1.1.0</version>
-    </dependency>
+```
+<dependency>
+  <groupId>org.fxmisc.cssfx</groupId>
+  <artifactId>cssfx</artifactId>
+  <version>11.0.0</version>
+</dependency>
+```
+
+__Gradle__
+
+```
+dependencies {
+    compile "org.fxmisc.cssfx:cssfx:11.0.0"
+}
+```
+
+## Java 8
+
+Versions compatible with JavaFX 8 are all `1.X` versions (see [latest on central](https://search.maven.org/search?q=g:org.fxmisc.cssfx%20AND%20a:cssfx%20AND%20v:1.*))
+
+__Maven__
+
+```
+<dependency>
+  <groupId>org.fxmisc.cssfx</groupId>
+  <artifactId>cssfx</artifactId>
+  <version>1.1.0</version>
+</dependency>
+```
+
+__Gradle__
+
+```
+dependencies {
+    compile "org.fxmisc.cssfx:cssfx:1.1.0"
+}
+```
 
 ## Usages
 
@@ -26,7 +60,9 @@ __Maven__
 
 Starting monitoring CSS changes in development is as simple as adding one line in your application code.
 
-    CSSFX.start()
+```
+CSSFX.start()
+```
 
 Doing so CSSFX will start to track every CSS resource that will be declared on any Scene or Parent in your application. This monitoring will be active for all the Stage that your application will use.  
 
@@ -123,3 +159,18 @@ CSSFXLogger.setLoggerFactory((loggerName) -> (level, message, args) -> {
 ------------------------
 Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central.  
 
+## Build & release
+
+### Normal build
+
+- `mvnw clean install` : UI tests are run headless
+- `mvnw -P-ci clean install` : UI tests are run visible on screen
+
+### Release
+
+- `mvnw -Prelease,ci clean install`: this will simulate a full build for oss delivery (javadoc, source attachement, GPG signature, ...)
+- `git tag -a -s -m "release X.Y.Z, additionnal reason" X.Y.Z`: tag the current HEAD with the given tag name. The tag is signed by the author of the release. Adapt with gpg key of maintainer.
+    - Matthieu Brouillard command:  `git tag -a -s -u 2AB5F258 -m "release X.Y.Z, additional reason" X.Y.Z`
+    - Matthieu Brouillard [public key](https://sks-keyservers.net/pks/lookup?op=get&search=0x8139E8632AB5F258)
+- `mvnw -Prelease,ci -DskipTests deploy`
+- `git push --follow-tags origin master`
