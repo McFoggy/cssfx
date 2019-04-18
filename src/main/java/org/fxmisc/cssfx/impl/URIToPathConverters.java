@@ -150,7 +150,7 @@ public class URIToPathConverters {
                 }
             }
 
-            logger(URIToPathConverters.class).debug("GRADLE converter failed to map css[%s] to a source file", uri);
+            logger(URIToPathConverters.class).debug("INTELLIJ converter failed to map css[%s] to a source file", uri);
             return null;
         }
     };
