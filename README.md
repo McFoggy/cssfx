@@ -147,18 +147,6 @@ CSSFXLogger.setLoggerFactory((loggerName) -> (level, message, args) -> {
 });
 ```
 
-### Badges
-
-| Badge type | Badge |
-|:-----------:|:------------------|
-| build on master|[![Build Status Main](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx)|
-| build latest commit|[![Build Status Latest](https://travis-ci.org/McFoggy/cssfx.svg)](https://travis-ci.org/McFoggy/cssfx)|
-| maven latest | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.cssfx/cssfx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.cssfx/cssfx)|
-| open hub | [![Open Hub project report for CSSFX](https://www.openhub.net/p/cssfx/widgets/project_thin_badge.gif)](https://www.openhub.net/p/cssfx?ref=sample) |
-
-------------------------
-Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central.  
-
 ## Build & release
 
 ### Normal build
@@ -174,3 +162,9 @@ Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc
     - Matthieu Brouillard [public key](https://sks-keyservers.net/pks/lookup?op=get&search=0x8139E8632AB5F258)
 - `mvnw -Prelease,ci -DskipTests deploy`
 - `git push --follow-tags origin master`
+
+## Credits
+
+Thanks to all [contributors](https://github.com/McFoggy/cssfx/graphs/contributors) and people who reported issues or enhancement requests.
+
+Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central.  
