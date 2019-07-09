@@ -20,7 +20,7 @@ __Maven__
 <dependency>
   <groupId>org.fxmisc.cssfx</groupId>
   <artifactId>cssfx</artifactId>
-  <version>11.0.0</version>
+  <version>11.0.1</version>
 </dependency>
 ```
 
@@ -28,7 +28,7 @@ __Gradle__
 
 ```
 dependencies {
-    compile "org.fxmisc.cssfx:cssfx:11.0.0"
+    compile "org.fxmisc.cssfx:cssfx:11.0.1"
 }
 ```
 
@@ -42,7 +42,7 @@ __Maven__
 <dependency>
   <groupId>org.fxmisc.cssfx</groupId>
   <artifactId>cssfx</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
 </dependency>
 ```
 
@@ -50,7 +50,7 @@ __Gradle__
 
 ```
 dependencies {
-    compile "org.fxmisc.cssfx:cssfx:1.1.0"
+    compile "org.fxmisc.cssfx:cssfx:1.1.1"
 }
 ```
 
