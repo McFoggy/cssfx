@@ -26,23 +26,15 @@ import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
 
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class ApplicationStages {
-    public static ObservableList<Stage> monitoredStages(Stage ...restrictedTo) {
-        try {
-            ObservableList<Stage> stages = Window.getWindows().stream()
-                .map(Stage.class::cast)
-                .collect(
-                    Collectors.collectingAndThen(toList(), FXCollections::observableArrayList)
-                );
-            logger(ApplicationStages.class).debug("successfully retrieved JavaFX stages by calling javafx.stage.Window.getWindows()");
-            return stages;
-        } catch (Exception e) {
-            logger(ApplicationStages.class).error("cannot observe stages changes by calling javafx.stage.Window.getWindows()", e);
-        }
-        return FXCollections.emptyObservableList();
+    public static ObservableList<Window> monitoredStages(Window ...restrictedTo) {
+        System.out.println(" ### asdf");
+
+        return Window.getWindows();
     }
 }
