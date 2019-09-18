@@ -31,6 +31,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import javafx.stage.Window;
 import org.fxmisc.cssfx.api.URIToPathConverter;
 import org.fxmisc.cssfx.impl.ApplicationStages;
 import org.fxmisc.cssfx.impl.CSSFXMonitor;
@@ -60,9 +61,9 @@ public class CSSFX {
      * @param stage the stage that will be monitored
      * @return a Runnable object to stop CSSFX monitoring
      */
-    public static Runnable start(Stage stage) {
+    public static Runnable start(Window stage) {
         CSSFXConfig cfg = new CSSFXConfig();
-        cfg.setRestrictedToStage(stage);
+        cfg.setRestrictedToWindow(stage);
         return cfg.start();
     }
     
@@ -104,7 +105,7 @@ public class CSSFX {
      */
     public static CSSFXConfig onlyFor(Stage s) {
         CSSFXConfig cfg = new CSSFXConfig();
-        cfg.setRestrictedToStage(s);
+        cfg.setRestrictedToWindow(s);
         return cfg;
     }
     /**
@@ -147,14 +148,14 @@ public class CSSFX {
     public static class CSSFXConfig {
         // LinkedHashSet will preserve ordering
         private final Set<URIToPathConverter> converters = new LinkedHashSet<URIToPathConverter>(Arrays.asList(URIToPathConverters.DEFAULT_CONVERTERS));
-        private Stage restrictedToStage = null;
+        private Window restrictedToStage = null;
         private Scene restrictedToScene = null;
         private Node restrictedToNode = null;
         
         CSSFXConfig() {
         }
 
-        void setRestrictedToStage(Stage restrictedToStage) {
+        void setRestrictedToWindow(Window restrictedToStage) {
             this.restrictedToStage = restrictedToStage;
         }
 
@@ -232,7 +233,8 @@ public class CSSFX {
                 m.setNodes(FXCollections.singletonObservableList(restrictedToNode));
             } else {
                 // we monitor all the stages
-                ObservableList<Stage> monitoredStages = (restrictedToStage == null)?ApplicationStages.monitoredStages():FXCollections.singletonObservableList(restrictedToStage);
+                // THIS CANNOT WORK!
+                ObservableList<Window> monitoredStages = (restrictedToStage == null)?ApplicationStages.monitoredStages():FXCollections.singletonObservableList(restrictedToStage);
                 m.setStages(monitoredStages);
             }
             
