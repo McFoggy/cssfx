@@ -33,7 +33,6 @@ import javafx.stage.Window;
 
 public class ApplicationStages {
     public static ObservableList<Window> monitoredStages(Window ...restrictedTo) {
-        System.out.println(" ### asdf");
 
         return Window.getWindows();
     }
