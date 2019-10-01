@@ -55,7 +55,7 @@ public class PathsWatcher {
             Map<String, List<Runnable>> fileAction = filesActions.computeIfAbsent(
                     directory.toString(), (p) -> {
                         try {
-                            directory.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, SensitivityWatchEventModifier.HIGH);
+                            directory.register(watchService, new WatchEvent.Kind[]{ StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE}, SensitivityWatchEventModifier.HIGH);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -88,7 +88,7 @@ public class PathsWatcher {
                         WatchEvent.Kind<?> kind = event.kind();
                         logger(PathsWatcher.class).debug("'%s' change detected in directory %s", kind, directory);
 
-                        if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                        if (kind == StandardWatchEventKinds.ENTRY_MODIFY || kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_DELETE) {
                             // it is a modification
                             @SuppressWarnings("unchecked")
                             WatchEvent<Path> ev = (WatchEvent<Path>) event;
