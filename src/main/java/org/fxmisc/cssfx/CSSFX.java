@@ -53,17 +53,17 @@ public class CSSFX {
     }
     
     /**
-     * Directly start monitoring CSS for the given Stage.
+     * Directly start monitoring CSS for the given Window.
      * <ul>
      * <li>standard source file detectors: Maven, Gradle, execution from built JAR (details in {@link URIToPathConverters#DEFAULT_CONVERTERS})</li>
-     * <li>detection activated on the stage only (and its children)</li>
+     * <li>detection activated on the given Window only (and its children)</li>
      * </ul> 
-     * @param stage the stage that will be monitored
+     * @param window the window that will be monitored
      * @return a Runnable object to stop CSSFX monitoring
      */
-    public static Runnable start(Window stage) {
+    public static Runnable start(Window window) {
         CSSFXConfig cfg = new CSSFXConfig();
-        cfg.setRestrictedToWindow(stage);
+        cfg.setRestrictedToWindow(window);
         return cfg.start();
     }
     
@@ -100,12 +100,12 @@ public class CSSFX {
     /**
      * Restrict the source file detection for graphical sub-tree of the given {@link Stage}
      * 
-     * @param s the stage to restrict the detection on, if null then no restriction will apply
+     * @param window the window to restrict the detection on, if null then no restriction will apply
      * @return a {@link CSSFXConfig} object as a builder to allow further configuration
      */
-    public static CSSFXConfig onlyFor(Stage s) {
+    public static CSSFXConfig onlyFor(Window window) {
         CSSFXConfig cfg = new CSSFXConfig();
-        cfg.setRestrictedToWindow(s);
+        cfg.setRestrictedToWindow(window);
         return cfg;
     }
     /**
@@ -148,15 +148,15 @@ public class CSSFX {
     public static class CSSFXConfig {
         // LinkedHashSet will preserve ordering
         private final Set<URIToPathConverter> converters = new LinkedHashSet<URIToPathConverter>(Arrays.asList(URIToPathConverters.DEFAULT_CONVERTERS));
-        private Window restrictedToStage = null;
+        private Window restrictedToWindow = null;
         private Scene restrictedToScene = null;
         private Node restrictedToNode = null;
         
         CSSFXConfig() {
         }
 
-        void setRestrictedToWindow(Window restrictedToStage) {
-            this.restrictedToStage = restrictedToStage;
+        void setRestrictedToWindow(Window restrictedToWindow) {
+            this.restrictedToWindow = restrictedToWindow;
         }
 
         void setRestrictedToScene(Scene restrictedToScene) {
@@ -225,8 +225,8 @@ public class CSSFX {
             
             CSSFXMonitor m = new CSSFXMonitor();
             
-            if (restrictedToStage != null) {
-                m.setStages(FXCollections.singletonObservableList(restrictedToStage));
+            if (restrictedToWindow != null) {
+                m.setWindows(FXCollections.singletonObservableList(restrictedToWindow));
             } else if (restrictedToScene != null) {
                 m.setScenes(FXCollections.singletonObservableList(restrictedToScene));
             } else if (restrictedToNode != null) {
@@ -234,8 +234,8 @@ public class CSSFX {
             } else {
                 // we monitor all the stages
                 // THIS CANNOT WORK!
-                ObservableList<Window> monitoredStages = (restrictedToStage == null)?ApplicationStages.monitoredStages():FXCollections.singletonObservableList(restrictedToStage);
-                m.setStages(monitoredStages);
+                ObservableList<Window> monitoredStages = (restrictedToWindow == null)?Window.getWindows():FXCollections.singletonObservableList(restrictedToWindow);
+                m.setWindows(monitoredStages);
             }
             
             return start(() -> m);

@@ -26,14 +26,28 @@ import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
 
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class ApplicationStages {
-    public static ObservableList<Window> monitoredStages(Window ...restrictedTo) {
-
-        return Window.getWindows();
+    /**
+     * @deprecated do not use this method anymore,
+     * @see Window#getWindows for similar functionnality
+     */
+    @Deprecated(forRemoval = true, since = "11.0.2")
+    public static ObservableList<Stage> monitoredStages(Stage ... restrictedTo) {
+        try {
+            ObservableList<Stage> stages = Window.getWindows().stream()
+                    .map(Stage.class::cast)
+                    .collect(
+                            Collectors.collectingAndThen(toList(), FXCollections::observableArrayList)
+                    );
+            logger(ApplicationStages.class).debug("successfully retrieved JavaFX stages by calling javafx.stage.Window.getWindows()");
+            return stages;
+        } catch (Exception e) {
+            logger(ApplicationStages.class).error("cannot observe stages changes by calling javafx.stage.Window.getWindows()", e);
+        }
+        return FXCollections.emptyObservableList();
     }
 }
