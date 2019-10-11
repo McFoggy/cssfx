@@ -1,3 +1,7 @@
+dist: bionic
+services:
+  - xvfb
+
 language: java
 
 git:
@@ -6,8 +10,6 @@ git:
 before_install:
   - ./travis-set-branch.sh
   - "git log -n 1"
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
 
 jdk:
-  - oraclejdk11
+  - openjdk11
