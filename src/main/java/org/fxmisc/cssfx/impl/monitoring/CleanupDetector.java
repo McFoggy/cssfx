@@ -30,17 +30,19 @@ public class CleanupDetector {
     static ReferenceQueue queue = new ReferenceQueue();;
 
     static {
-        new Thread(() -> {
-            while(true) {
+        Thread cleanupDetectorThread = new Thread(() -> {
+            while (true) {
                 try {
                     PhantomReferenceWithRunnable r = (PhantomReferenceWithRunnable) queue.remove();
                     references.remove(r);
                     r.r.run();
-                } catch(Throwable e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }, "CSSFX-cleanup-detector");
+        cleanupDetectorThread.setDaemon(true);
+        cleanupDetectorThread.start();
     }
 
     static PhantomReferenceWithRunnable pr = null;
