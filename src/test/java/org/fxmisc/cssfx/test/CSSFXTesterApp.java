@@ -34,6 +34,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
+import javafx.stage.WindowEvent;
 import org.fxmisc.cssfx.CSSFX;
 
 public class CSSFXTesterApp extends Application {
@@ -43,7 +44,10 @@ public class CSSFXTesterApp extends Application {
     public void start(Stage stage) throws Exception {
         fillStage(stage);
         stage.show();
-        CSSFX.start();
+        Runnable cssfxCloseAction = CSSFX.start();
+
+        stage.getScene().getWindow()
+                .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, (event) -> cssfxCloseAction.run());
     }
 
     public void initUI(Stage stage) {
