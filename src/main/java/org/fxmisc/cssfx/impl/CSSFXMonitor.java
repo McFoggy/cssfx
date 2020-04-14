@@ -23,6 +23,7 @@ package org.fxmisc.cssfx.impl;
 
 import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
 
+import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -53,6 +55,7 @@ import org.fxmisc.cssfx.api.URIToPathConverter;
 import org.fxmisc.cssfx.impl.events.CSSFXEvent;
 import org.fxmisc.cssfx.impl.events.CSSFXEvent.EventType;
 import org.fxmisc.cssfx.impl.events.CSSFXEventListener;
+import org.fxmisc.cssfx.impl.monitoring.CleanupDetector;
 import org.fxmisc.cssfx.impl.monitoring.PathsWatcher;
 
 /**
@@ -272,6 +275,13 @@ public class CSSFXMonitor {
         for (String uri : stylesheets) {
             registrar.register(uri, stylesheets);
         }
+
+        CleanupDetector.onCleanup(stylesheets, () -> {
+            Platform.runLater(() -> {
+                // This is important, so no empty "Runnables" build up in the PathsWatcher
+                registrar.cleanup();
+            });
+        });
     }
 
     private void registerScene(Scene scene) {
@@ -303,68 +313,50 @@ public class CSSFXMonitor {
         }
     }
 
-    private static class URIRegistrar {
-        final Map<String, Set<ObservableList<? extends String>>> stylesheetsContainingURI = new HashMap<>();
+    public static class URIRegistrar {
         final Map<String, Path> sourceURIs = new HashMap<>();
+        final Map<Path, List<Runnable>> actions = new HashMap<>();
         final List<URIToPathConverter> converters;
         private PathsWatcher wp;
 
-        URIRegistrar(List<URIToPathConverter> c, PathsWatcher wp) {
+        public URIRegistrar(List<URIToPathConverter> c, PathsWatcher wp) {
             converters = c;
             this.wp = wp;
         }
 
-        private void register(String uri, ObservableList<? extends String> stylesheets) {
+        public void register(String uri, ObservableList<? extends String> stylesheets) {
             if (!sourceURIs.containsKey(uri)) {
                 logger(CSSFXMonitor.class).debug("searching source for css[%s]", uri);
-                // we do not yet have a source mapping for the URI
-                // let's register this URI
-                Set<ObservableList<? extends String>> uriUsedIn = stylesheetsContainingURI.computeIfAbsent(uri, k -> new HashSet<>());
-                uriUsedIn.add(stylesheets);
+                for (URIToPathConverter c : converters) {
+                    Path sourceFile = c.convert(uri);
+                    List<Runnable> runnables = new LinkedList<>();
+                    if (sourceFile != null) {
+                        logger(CSSFXMonitor.class).info("css[%s] will be mapped to source[%s]", uri, sourceFile);
+                        Path directory = sourceFile.getParent();
 
-                evaluateSourceMappingForURI(uri);
-            }
-        }
+                        Runnable r = new URIStyleUpdater(uri, sourceFile.toUri().toString(), (ObservableList<String>) stylesheets);
+                        wp.monitor(directory.toAbsolutePath().normalize(), sourceFile.toAbsolutePath().normalize(), r);
+                        runnables.add(r);
 
-        @SuppressWarnings("unchecked")
-        private void evaluateSourceMappingForURI(String uri) {
-            for (URIToPathConverter c : converters) {
-                Path sourceFile = c.convert(uri);
-
-                if (sourceFile != null) {
-                    logger(CSSFXMonitor.class).info("css[%s] will be mapped to source[%s]", uri, sourceFile);
-                    Path directory = sourceFile.getParent();
-
-                    // let's see if other mappings were not waiting for a source mapping
-                    final Set<ObservableList<? extends String>> set = stylesheetsContainingURI.get(uri);
-                    for (Iterator<ObservableList<? extends String>> it = set.iterator(); it.hasNext();) {
-                        ObservableList<? extends String> waitingStylesheets = it.next();
-                        if (!waitingStylesheets.contains(uri)) {
-                            it.remove();
-                        } else {
-                            wp.monitor(directory.toAbsolutePath().normalize(), sourceFile.toAbsolutePath().normalize(), new URIStyleUpdater(uri,
-                                    sourceFile.toUri().toString(), (ObservableList<String>) waitingStylesheets));
-                        }
+                        sourceURIs.put(sourceFile.toUri().toString(), sourceFile);
                     }
-                    stylesheetsContainingURI.remove(uri);
-                    sourceURIs.put(sourceFile.toUri().toString(), sourceFile);
-                    break;
+                    actions.put(sourceFile,runnables);
                 }
             }
         }
 
-        private void unregister(String uri) {
+        public void unregister(String uri) {
         }
 
-        /**
-         * Reevaluate not mapped uris
-         */
-        @SuppressWarnings("unused")
-        private void reevaluate() {
-            for (String uri : stylesheetsContainingURI.keySet()) {
-                evaluateSourceMappingForURI(uri);
-            }
+
+        public void cleanup() {
+            actions.forEach((path,runnables) -> {
+                runnables.forEach( runnable -> {
+                    wp.unregister(path.getParent().toAbsolutePath().normalize(), path.toAbsolutePath().normalize(), runnable);
+                });
+            });
         }
+
     }
 
     private static class StyleSheetChangeListener implements ListChangeListener<String> {
@@ -391,44 +383,42 @@ public class CSSFXMonitor {
         }
     }
 
-    final ListChangeListener<String> styleSheetChangeListener = new ListChangeListener<String>() {
-        @Override
-        public void onChanged(javafx.collections.ListChangeListener.Change<? extends String> c) {
-        }
-    };
 
-    private static class URIStyleUpdater implements Runnable {
+    public static class URIStyleUpdater implements Runnable {
         private final String sourceURI;
         private final String originalURI;
-        private final ObservableList<String> cssURIs;
+        private final WeakReference<ObservableList<String>> cssURIsWeak;
 
-        URIStyleUpdater(String originalURI, String sourceURI, ObservableList<String> cssURIs) {
+        public URIStyleUpdater(String originalURI, String sourceURI, ObservableList<String> cssURIs) {
             this.originalURI = originalURI;
             this.sourceURI = sourceURI;
-            this.cssURIs = cssURIs;
+            this.cssURIsWeak = new WeakReference<>(cssURIs);
         }
 
         @Override
         public void run() {
             IntegerProperty positionIndex = new SimpleIntegerProperty();
+            ObservableList<String> cssURIs = cssURIsWeak.get();
 
-            Platform.runLater(() -> {
-                positionIndex.set(cssURIs.indexOf(originalURI));
-                if (positionIndex.get() != -1) {
-                    cssURIs.remove(originalURI);
-                }
-                if (positionIndex.get() == -1) {
-                    positionIndex.set(cssURIs.indexOf(sourceURI));
-                }
-                cssURIs.remove(sourceURI);
-            });
-            Platform.runLater(() -> {
-                if (positionIndex.get() >= 0) {
-                    cssURIs.add(positionIndex.get(), sourceURI);
-                } else {
-                    cssURIs.add(sourceURI);
-                }
-            });
+            if(cssURIs != null) {
+                Platform.runLater(() -> {
+                    positionIndex.set(cssURIs.indexOf(originalURI));
+                    if (positionIndex.get() != -1) {
+                        cssURIs.remove(originalURI);
+                    }
+                    if (positionIndex.get() == -1) {
+                        positionIndex.set(cssURIs.indexOf(sourceURI));
+                    }
+                    cssURIs.remove(sourceURI);
+                });
+                Platform.runLater(() -> {
+                    if (positionIndex.get() >= 0) {
+                        cssURIs.add(positionIndex.get(), sourceURI);
+                    } else {
+                        cssURIs.add(sourceURI);
+                    }
+                });
+            }
         }
     }
 }
