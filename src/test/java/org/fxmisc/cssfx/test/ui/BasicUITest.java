@@ -25,6 +25,7 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.fxmisc.cssfx.CSSFX;
+import org.fxmisc.cssfx.test.misc.DisabledOnMac;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
@@ -72,6 +73,7 @@ public class BasicUITest {
     }
 
     @Test
+    @DisabledOnMac
     public void checkCSSFXCanChangeTheLabelFontColor(FxRobot robot) throws Exception {
         // The CSS used by the UI
         URI basicCSS = BasicUI.class.getResource("basic.css").toURI();
