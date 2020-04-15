@@ -25,27 +25,21 @@ import javafx.scene.paint.Color;
 import org.fxmisc.cssfx.impl.monitoring.CleanupDetector;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class TestCleanupDetector {
 
-    int counter = 0;
+    CountDownLatch latch = new CountDownLatch(1);
+    Runnable r = () -> latch.countDown();
 
     @Test
     public void isRunnableCalled() throws Exception{
-
-        Runnable r = () -> {
-            counter += 1;
-        };
-
         JMemoryBuddy.memoryTest(checker -> {
             Object o = new Object();
             CleanupDetector.onCleanup(o, r);
             checker.assertCollectable(o);
         });
-
-
-        assertThat(counter, is(1));
+        latch.await(1, TimeUnit.SECONDS);
     }
 }

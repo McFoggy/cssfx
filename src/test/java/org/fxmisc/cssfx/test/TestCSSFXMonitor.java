@@ -32,9 +32,6 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 public class TestCSSFXMonitor {
 
     @BeforeAll
@@ -49,7 +46,6 @@ public class TestCSSFXMonitor {
         }
     }
 
-
     CountDownLatch latch = new CountDownLatch(1);
     Runnable r = () -> latch.countDown();
 
@@ -58,7 +54,6 @@ public class TestCSSFXMonitor {
         JMemoryBuddy.memoryTest((checker) -> {
             ObservableList<String> list = FXCollections.observableArrayList();
             new CSSFXMonitor().monitorStylesheets(list);
-
             CleanupDetector.onCleanup(list, r);
             checker.assertCollectable(list);
         });
