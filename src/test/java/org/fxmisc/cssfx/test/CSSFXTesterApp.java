@@ -23,6 +23,8 @@ package org.fxmisc.cssfx.test;
 import java.util.Random;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -70,7 +72,17 @@ public class CSSFXTesterApp extends Application {
     private Node createButtonBar() {
         FlowPane fp = new FlowPane();
         fp.getStyleClass().addAll("button-bar", "bottom");
-        fp.getChildren().addAll(new Button("Action"), new Button("Action"));
+        
+        Button gcAction = new Button("Force GC");
+        gcAction.addEventHandler(ActionEvent.ACTION, e -> {
+            System.out.println("Forcing a GC");
+            System.gc();
+        });
+        
+        Button fakeAction = new Button("Action");
+        fakeAction.addEventHandler(ActionEvent.ACTION, e -> System.out.println("You clicked the fake action button"));
+        
+        fp.getChildren().addAll(gcAction, fakeAction);
         String buttonBarCSSUri = getClass().getResource("bottom.css").toExternalForm();
         fp.getStylesheets().add(buttonBarCSSUri);
 
