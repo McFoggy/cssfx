@@ -70,7 +70,7 @@ public class BasicUITest {
             stopper.run();
         }
     }
-    
+
     @Test
     public void checkCSSFXCanChangeTheLabelFontColor(FxRobot robot) throws Exception {
         // The CSS used by the UI

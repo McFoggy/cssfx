@@ -69,6 +69,10 @@ public class PathsWatcher {
             logger(PathsWatcher.class).warn("no WatchService active, CSS monitoring cannot occur");
         }
     }
+    public void unregister(Path directory, Path sourceFile, Runnable action) {
+        //Path directory, Path sourceFile, Runnable action
+        filesActions.get(directory.toString()).get(sourceFile.toString()).remove(action);
+    }
 
     public void watch() {
         watcherThread = new Thread(new Runnable() {
