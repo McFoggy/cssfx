@@ -25,6 +25,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.fxmisc.cssfx.impl.CSSFXMonitor;
+import org.fxmisc.cssfx.impl.log.CSSFXLogger;
 import org.fxmisc.cssfx.impl.monitoring.CleanupDetector;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -51,8 +52,11 @@ public class TestCSSFXMonitor {
 
     @Test
     public void testMonitorStyleSheetsSheetsGetCollected() throws Exception {
+        CSSFXLogger.console();
         JMemoryBuddy.memoryTest((checker) -> {
             ObservableList<String> list = FXCollections.observableArrayList();
+            String uri = getClass().getResource("bottom.css").toExternalForm();
+            list.add(uri);
             new CSSFXMonitor().monitorStylesheets(list);
             CleanupDetector.onCleanup(list, r);
             checker.assertCollectable(list);
