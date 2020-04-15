@@ -265,7 +265,7 @@ public class CSSFXMonitor {
         }
     }
 
-    private void monitorStylesheets(ObservableList<String> stylesheets) {
+    public void monitorStylesheets(ObservableList<String> stylesheets) {
         final URIRegistrar registrar = new URIRegistrar(knownConverters, pw);
 
         // first register for changes
