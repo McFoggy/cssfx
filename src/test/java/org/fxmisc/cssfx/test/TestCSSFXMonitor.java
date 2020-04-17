@@ -52,7 +52,6 @@ public class TestCSSFXMonitor {
 
     @Test
     public void testMonitorStyleSheetsSheetsGetCollected() throws Exception {
-        CSSFXLogger.console();
         JMemoryBuddy.memoryTest((checker) -> {
             ObservableList<String> list = FXCollections.observableArrayList();
             String uri = getClass().getResource("bottom.css").toExternalForm();

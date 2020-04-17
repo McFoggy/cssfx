@@ -32,8 +32,6 @@ public class TestPathsWatcher {
 
     @Test
     void testPathsWatcher() {
-        CSSFXLogger.console();
-
         PathsWatcher watcher = new PathsWatcher();
         Path directory = new File(".").toPath();
         Path file = new File("./pom.xml").toPath();

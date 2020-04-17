@@ -43,8 +43,6 @@ public class TestURIRegistrar {
 
     @Test
     public void testURIRegistrar() {
-        CSSFXLogger.console();
-
         JMemoryBuddy.memoryTest(checker -> {
             ObservableList<String> list = FXCollections.observableArrayList();
             String uri = getClass().getResource("bottom.css").toExternalForm();
