@@ -27,13 +27,9 @@ public final class CSSFXEvent<T> {
     
     public static enum EventType {
         STYLESHEET_ADDED
-        , STYLESHEET_REMOVED
         , NODE_ADDED
-        , NODE_REMOVED
         , SCENE_ADDED
-        , SCENE_REMOVED
         , STAGE_ADDED
-        , STAGE_REMOVED
     }
     
     private  CSSFXEvent(EventType type, T data) {
