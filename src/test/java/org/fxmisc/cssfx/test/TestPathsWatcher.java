@@ -21,8 +21,11 @@ package org.fxmisc.cssfx.test;
  */
 
 import de.sandec.jmemorybuddy.JMemoryBuddy;
+import org.fxmisc.cssfx.CSSFX;
 import org.fxmisc.cssfx.impl.log.CSSFXLogger;
 import org.fxmisc.cssfx.impl.monitoring.PathsWatcher;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -30,6 +33,16 @@ import java.nio.file.Path;
 
 public class TestPathsWatcher {
 
+    @BeforeAll
+    static void configure() {
+        CSSFXLogger.console();
+    }
+    
+    @AfterAll
+    static void reset() {
+        CSSFXLogger.noop();
+    }
+    
     @Test
     void testPathsWatcher() {
         PathsWatcher watcher = new PathsWatcher();
@@ -50,7 +63,6 @@ public class TestPathsWatcher {
             checker.assertCollectable(r);
             r = null;
         });
-
     }
 
     public static class EmptyRunnable implements Runnable{
