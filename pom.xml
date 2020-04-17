@@ -39,6 +39,18 @@
             <name>Matthieu Brouillard</name>
             <url>https://github.com/mcfoggy</url>
             <id>McFoggy</id>
+            <roles>
+                <role>Founder</role>
+                <role>Maintainer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>FlorianKirmaier</id>
+            <name>Florian Kirmaier</name>
+            <url>https://github.com/FlorianKirmaier</url>
+            <roles>
+                <role>Contributor</role>
+            </roles>
         </developer>
     </developers>
 
