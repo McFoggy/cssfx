@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javafx.application.Platform;
@@ -61,7 +63,7 @@ import org.fxmisc.cssfx.impl.monitoring.PathsWatcher;
 
 /**
  * CSSFXMonitor is the central controller of the CSS monitoring feature.   
- *   
+ *
  * @author Matthieu Brouillard
  */
 public class CSSFXMonitor {
@@ -73,10 +75,13 @@ public class CSSFXMonitor {
     private ObservableList<Scene> scenes;
     private ObservableList<Node> nodes;
     private List<CSSFXEventListener> eventListeners = new CopyOnWriteArrayList<>();
+    private Set<Scene> knownScenes = Collections.newSetFromMap(new WeakHashMap<>());
+    private Set<Window> knownWindows = Collections.newSetFromMap(new WeakHashMap<>());
+    private Set<Node> knownNodes = Collections.newSetFromMap(new WeakHashMap<>());
 
     public CSSFXMonitor() {
     }
-    
+
     public void setStages(ObservableList<Stage> stages) {
         setWindows(stages);
     }
@@ -121,7 +126,7 @@ public class CSSFXMonitor {
         logger(CSSFXMonitor.class).info("CSS Monitoring is about to start");
 
         pw = new PathsWatcher();
-        
+
         Runnable starter = () -> {
             // start to monitor stage changes
             if (windows != null) {
@@ -132,17 +137,17 @@ public class CSSFXMonitor {
                 monitorChildren(nodes);
             }
         };
-        
+
         if (Platform.isFxApplicationThread()) {
             starter.run();
         } else {
             Platform.runLater(starter);
         }
-        
+
         pw.watch();
         logger(CSSFXMonitor.class).info("CSS Monitoring started");
     }
-    
+
     public void stop() {
         pw.stop();
     }
@@ -211,18 +216,22 @@ public class CSSFXMonitor {
     }
 
     private void unregisterNode(Node removedNode) {
-        eventNotify(CSSFXEvent.newEvent(EventType.NODE_REMOVED, removedNode));
+        if (knownNodes.remove(removedNode)) {
+            eventNotify(CSSFXEvent.newEvent(EventType.NODE_REMOVED, removedNode));
+        }
     }
 
     private void registerNode(Node node) {
-        if (node instanceof Parent) {
-            Parent p = (Parent) node;
-            monitorStylesheets(p.getStylesheets());
-            monitorChildren(p.getChildrenUnmodifiable());
+        if (knownNodes.add(node)) {
+            if (node instanceof Parent) {
+                Parent p = (Parent) node;
+                monitorStylesheets(p.getStylesheets());
+                monitorChildren(p.getChildrenUnmodifiable());
+            }
+            eventNotify(CSSFXEvent.newEvent(EventType.NODE_ADDED, node));
         }
-        eventNotify(CSSFXEvent.newEvent(EventType.NODE_ADDED, node));
     }
-    
+
     private void monitorScenes(ObservableList<Scene> observableScenes) {
         // first listen for changes
         observableScenes.addListener(new ListChangeListener<Scene>() {
@@ -242,7 +251,7 @@ public class CSSFXMonitor {
                 }
             }
         });
-        
+
         // then add existing values
         for (Scene s : observableScenes) {
             registerScene(s);
@@ -296,26 +305,34 @@ public class CSSFXMonitor {
     }
 
     private void registerScene(Scene scene) {
-        eventNotify(CSSFXEvent.newEvent(EventType.SCENE_ADDED, scene));
+        if (knownScenes.add(scene)) {
+            eventNotify(CSSFXEvent.newEvent(EventType.SCENE_ADDED, scene));
 
-        monitorStylesheets(scene.getStylesheets());
-        monitorRoot(scene.rootProperty());
+            monitorStylesheets(scene.getStylesheets());
+            monitorRoot(scene.rootProperty());
+        }
     }
 
     private void unregisterScene(Scene removedScene) {
-        eventNotify(CSSFXEvent.newEvent(EventType.SCENE_REMOVED, removedScene));
+        if (knownScenes.remove(removedScene)) {
+            eventNotify(CSSFXEvent.newEvent(EventType.SCENE_REMOVED, removedScene));
+        }
     }
 
     private void registerWindow(Window stage) {
-        eventNotify(CSSFXEvent.newEvent(EventType.STAGE_ADDED, stage));
-        monitorStageScene(stage.sceneProperty());
+        if (knownWindows.add(stage)) {
+            eventNotify(CSSFXEvent.newEvent(EventType.STAGE_ADDED, stage));
+            monitorStageScene(stage.sceneProperty());
+        }
     }
 
     private void unregisterWindow(Window removedStage) {
-        if (removedStage.getScene() != null) {
-            eventNotify(CSSFXEvent.newEvent(EventType.SCENE_REMOVED, removedStage.getScene()));
+        if (knownWindows.remove(removedStage)) {
+            if (removedStage.getScene() != null) {
+                unregisterScene(removedStage.getScene());
+            }
+            eventNotify(CSSFXEvent.newEvent(EventType.STAGE_REMOVED, removedStage));
         }
-        eventNotify(CSSFXEvent.newEvent(EventType.STAGE_REMOVED, removedStage));
     }
 
     private void eventNotify(CSSFXEvent<?> e) {
@@ -349,7 +366,7 @@ public class CSSFXMonitor {
                         wp.monitor(directory.toAbsolutePath().normalize(), sourceFile.toAbsolutePath().normalize(), r);
                         runnables.add(r);
                         sourceURIs.put(sourceFile.toUri().toString(), sourceFile);
-                        
+
                         if (Platform.isFxApplicationThread()) {
                             r.run();
                         } else {
