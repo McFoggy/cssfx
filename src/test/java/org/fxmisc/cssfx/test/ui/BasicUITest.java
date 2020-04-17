@@ -23,9 +23,11 @@ package org.fxmisc.cssfx.test.ui;
 
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import org.fxmisc.cssfx.CSSFX;
 import org.fxmisc.cssfx.test.misc.DisabledOnMac;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
@@ -38,7 +40,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -69,7 +75,10 @@ public class BasicUITest {
         try {
             Thread.sleep(1000);
             Label cssfxLabel = robot.lookup("#cssfx").queryAs(Label.class);
-            assertThat(cssfxLabel.getTextFill(), is(Color.BLUE));
+
+            Paint textColor = cssfxLabel.getTextFill();
+            assertThat("retrieved color is not one of expected", getExpectedTextColor(), hasItem(textColor));
+            assertThat(textColor, is(Color.BLUE));
         } finally {
             stopper.run();
         }
@@ -108,7 +117,9 @@ public class BasicUITest {
             
             // Let's check that initial launch has used the mapped
             Label cssfxLabel = robot.lookup("#cssfx").queryAs(Label.class);
-            assertThat(cssfxLabel.getTextFill(), is(Color.BLUE));
+            Paint textColor = cssfxLabel.getTextFill();
+            assertThat("retrieved color is not one of expected", getExpectedTextColor(), hasItem(textColor));
+            assertThat(textColor, is(Color.BLUE));
 
             // Copy the modified version in to the "source" file
             try {
@@ -117,12 +128,18 @@ public class BasicUITest {
                 e.printStackTrace();
             }
 
-            // We need to let CSSFX some time to detect the file change
+            // We TestMemoryLeaksneed to let CSSFX some time to detect the file change
             Thread.sleep(1000);
 
-            assertThat(cssfxLabel.getTextFill(), is(Color.RED));
+            textColor = cssfxLabel.getTextFill();
+            assertThat("retrieved color is not one of expected", getExpectedTextColor(), hasItem(textColor));
+            assertThat(textColor, is(Color.RED));
         } finally {
             stopper.run();
         }
+    }
+    
+    private static Collection<Paint> getExpectedTextColor() {
+        return Arrays.asList(Color.WHITE, Color.RED, Color.BLUE);
     }
 }
