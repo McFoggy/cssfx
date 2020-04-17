@@ -121,16 +121,24 @@ public class CSSFXMonitor {
         logger(CSSFXMonitor.class).info("CSS Monitoring is about to start");
 
         pw = new PathsWatcher();
-
-        // start to monitor stage changes
-        if (windows != null) {
-            monitorWindows(windows);
-        } else if (scenes != null) {
-            monitorScenes(scenes);
-        } else if (nodes != null) {
-            monitorChildren(nodes);
+        
+        Runnable starter = () -> {
+            // start to monitor stage changes
+            if (windows != null) {
+                monitorWindows(windows);
+            } else if (scenes != null) {
+                monitorScenes(scenes);
+            } else if (nodes != null) {
+                monitorChildren(nodes);
+            }
+        };
+        
+        if (Platform.isFxApplicationThread()) {
+            starter.run();
+        } else {
+            Platform.runLater(starter);
         }
-
+        
         pw.watch();
         logger(CSSFXMonitor.class).info("CSS Monitoring started");
     }
@@ -340,11 +348,13 @@ public class CSSFXMonitor {
                         Runnable r = new URIStyleUpdater(uri, sourceFile.toUri().toString(), (ObservableList<String>) stylesheets);
                         wp.monitor(directory.toAbsolutePath().normalize(), sourceFile.toAbsolutePath().normalize(), r);
                         runnables.add(r);
-                        Platform.runLater(() -> {
-                            r.run();
-                        });
-
                         sourceURIs.put(sourceFile.toUri().toString(), sourceFile);
+                        
+                        if (Platform.isFxApplicationThread()) {
+                            r.run();
+                        } else {
+                            Platform.runLater(r);
+                        }
                     }
                     actions.put(sourceFile,runnables);
                 }
@@ -407,7 +417,7 @@ public class CSSFXMonitor {
             ObservableList<String> cssURIs = cssURIsWeak.get();
 
             if(cssURIs != null) {
-                Platform.runLater(() -> {
+                Runnable remover = () -> {
                     positionIndex.set(cssURIs.indexOf(originalURI));
                     if (positionIndex.get() != -1) {
                         cssURIs.remove(originalURI);
@@ -416,14 +426,21 @@ public class CSSFXMonitor {
                         positionIndex.set(cssURIs.indexOf(sourceURI));
                     }
                     cssURIs.remove(sourceURI);
-                });
-                Platform.runLater(() -> {
+                };
+                Runnable adder = () -> {
                     if (positionIndex.get() >= 0) {
                         cssURIs.add(positionIndex.get(), sourceURI);
                     } else {
                         cssURIs.add(sourceURI);
                     }
-                });
+                };
+                if (Platform.isFxApplicationThread()) {
+                    remover.run();
+                    adder.run();
+                } else {
+                    Platform.runLater(remover);
+                    Platform.runLater(adder);
+                }
             }
         }
     }
