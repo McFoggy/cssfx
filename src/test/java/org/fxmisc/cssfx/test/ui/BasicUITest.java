@@ -32,6 +32,7 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,7 +53,7 @@ public class BasicUITest {
     }
 
     @Test
-    public void canRetrieveExpectedNodes(FxRobot robot) {
+    public void canRetrieveExpectedNodes(FxRobot robot) throws Exception {
         Runnable stopper = basicUI.startCSSFX();
         try {
             assertThat(robot.lookup(".label").queryAll().size(), is(2));
@@ -62,11 +63,13 @@ public class BasicUITest {
     }
     
     @Test
-    public void checkCSSIsApplied(FxRobot robot) {
+    public void checkCSSIsApplied(FxRobot robot) throws Exception {
         Runnable stopper = basicUI.startCSSFX();
+
         try {
+            Thread.sleep(1000);
             Label cssfxLabel = robot.lookup("#cssfx").queryAs(Label.class);
-            assertThat(cssfxLabel.getTextFill(), is(Color.WHITE));
+            assertThat(cssfxLabel.getTextFill(), is(Color.BLUE));
         } finally {
             stopper.run();
         }
@@ -78,16 +81,17 @@ public class BasicUITest {
         // The CSS used by the UI
         URI basicCSS = BasicUI.class.getResource("basic.css").toURI();
         String basicCSSUrl = basicCSS.toURL().toExternalForm();
-        
+
+        // Resources containing the color changes we want to apply to the CSS 
+        URI changedBasicCSSBlue = BasicUI.class.getResource("basic-cssfx-blue.css").toURI();
+        URI changedBasicCSSRed = BasicUI.class.getResource("basic-cssfx-red.css").toURI();
+
         // The file we will tell CSSFX to map the CSS to
         Path mappedSourceFile = Files.createTempFile("tmp", ".css");
         mappedSourceFile.toFile().deleteOnExit();
         
         // Let's start with the normal content first 
-        Files.copy(Paths.get(basicCSS), mappedSourceFile, StandardCopyOption.REPLACE_EXISTING);
-
-        // a resource containing the required changes we want to apply to the CSS 
-        URI changedBasicCSS = BasicUI.class.getResource("basic-cssfx.css").toURI();
+        Files.copy(Paths.get(changedBasicCSSBlue), mappedSourceFile, StandardCopyOption.REPLACE_EXISTING);
         
         // start CSSFX
         Runnable stopper = CSSFX.onlyFor(basicUI.getRootNode())
@@ -99,15 +103,24 @@ public class BasicUITest {
                     return null;
                 }).start();
         try {
-            // Copy the modified version in to the "source" file
-            Files.copy(Paths.get(changedBasicCSS), mappedSourceFile, StandardCopyOption.REPLACE_EXISTING);
-
             // We need to let CSSFX some time to detect the file change
-            // TODO check if waiting is really needed
-            Thread.sleep(2000);
-
+            Thread.sleep(1000);
+            
+            // Let's check that initial launch has used the mapped
             Label cssfxLabel = robot.lookup("#cssfx").queryAs(Label.class);
             assertThat(cssfxLabel.getTextFill(), is(Color.BLUE));
+
+            // Copy the modified version in to the "source" file
+            try {
+                Files.copy(Paths.get(changedBasicCSSRed), mappedSourceFile, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // We need to let CSSFX some time to detect the file change
+            Thread.sleep(1000);
+
+            assertThat(cssfxLabel.getTextFill(), is(Color.RED));
         } finally {
             stopper.run();
         }

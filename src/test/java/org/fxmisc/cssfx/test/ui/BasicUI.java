@@ -75,7 +75,7 @@ public class BasicUI extends Application {
             // The CSS used by the UI
             URI basicCSS = BasicUI.class.getResource("basic.css").toURI();
             // a resource containing the required changes we want to apply to the CSS
-            URI changedBasicCSS = BasicUI.class.getResource("basic-cssfx.css").toURI();
+            URI changedBasicCSS = BasicUI.class.getResource("basic-cssfx-blue.css").toURI();
 
             // start CSSFX
             return CSSFX.onlyFor(getRootNode())
