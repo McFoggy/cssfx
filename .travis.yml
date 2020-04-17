@@ -11,5 +11,9 @@ before_install:
   - ./travis-set-branch.sh
   - "git log -n 1"
 
+script:
+  - ./mvnw test -B -Dtest=BasicUITest
+  - ./mvnw test -B -Dtest=!BasicUITest
+
 jdk:
   - openjdk11
