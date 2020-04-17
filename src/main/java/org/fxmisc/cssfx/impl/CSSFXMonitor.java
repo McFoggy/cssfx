@@ -337,6 +337,9 @@ public class CSSFXMonitor {
                         Runnable r = new URIStyleUpdater(uri, sourceFile.toUri().toString(), (ObservableList<String>) stylesheets);
                         wp.monitor(directory.toAbsolutePath().normalize(), sourceFile.toAbsolutePath().normalize(), r);
                         runnables.add(r);
+                        Platform.runLater(() -> {
+                            r.run();
+                        });
 
                         sourceURIs.put(sourceFile.toUri().toString(), sourceFile);
                     }
