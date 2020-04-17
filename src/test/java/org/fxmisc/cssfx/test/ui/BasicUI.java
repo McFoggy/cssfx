@@ -52,8 +52,9 @@ public class BasicUI extends Application {
 
         container.getChildren().addAll(lblWelcome, lblCSSFX);
 
+        String defaultURI = BasicUI.class.getResource("default.css").toExternalForm();
         String basicURI = BasicUI.class.getResource("basic.css").toExternalForm();
-        container.getStylesheets().add(basicURI);
+        container.getStylesheets().addAll(defaultURI, basicURI);
         return container;
     }
 
