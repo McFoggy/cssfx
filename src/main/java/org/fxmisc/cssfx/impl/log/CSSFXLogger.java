@@ -62,9 +62,15 @@ public class CSSFXLogger {
      * Always use one of the 2 following methods and never keep static references to a logger. 
      */
     public static Logger logger(String loggerName) {
+        if (!isInitialized()) {
+            noop();
+        }
         return loggerFactory.getLogger(loggerName);
     }
     public static Logger logger(Class<?> loggerClass) {
+        if (!isInitialized()) {
+            noop();
+        }
         return loggerFactory.getLogger(loggerClass);
     }
     
