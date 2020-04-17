@@ -25,6 +25,7 @@ import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
 
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -272,7 +273,9 @@ public class CSSFXMonitor {
         stylesheets.addListener(new StyleSheetChangeListener(registrar));
 
         // then look already set stylesheets uris
-        for (String uri : stylesheets) {
+        // iterate over a copy to avoid concurrent modification
+        ArrayList<String> stylesheetsURI = new ArrayList<>(stylesheets);
+        for (String uri : stylesheetsURI) {
             registrar.register(uri, stylesheets);
         }
 
