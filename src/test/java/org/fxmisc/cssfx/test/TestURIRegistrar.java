@@ -23,12 +23,16 @@ package org.fxmisc.cssfx.test;
 import de.sandec.jmemorybuddy.JMemoryBuddy;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.Stage;
 import org.fxmisc.cssfx.api.URIToPathConverter;
 import org.fxmisc.cssfx.impl.CSSFXMonitor;
 import org.fxmisc.cssfx.impl.URIToPathConverters;
 import org.fxmisc.cssfx.impl.log.CSSFXLogger;
 import org.fxmisc.cssfx.impl.monitoring.PathsWatcher;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.framework.junit5.ApplicationExtension;
+import org.testfx.framework.junit5.Start;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -36,11 +40,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@ExtendWith(ApplicationExtension.class)
 public class TestURIRegistrar {
 
     private final List<URIToPathConverter> converters = Arrays.asList(URIToPathConverters.DEFAULT_CONVERTERS);
     private PathsWatcher pw = new PathsWatcher();
 
+
+    @Start
+    public void init(Stage stage) throws Exception {
+    }
+    
     @Test
     public void testURIRegistrar() {
         JMemoryBuddy.memoryTest(checker -> {
