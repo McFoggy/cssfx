@@ -430,33 +430,24 @@ public class CSSFXMonitor {
 
         @Override
         public void run() {
-            IntegerProperty positionIndex = new SimpleIntegerProperty();
             ObservableList<String> cssURIs = cssURIsWeak.get();
 
             if(cssURIs != null) {
-                Runnable remover = () -> {
-                    positionIndex.set(cssURIs.indexOf(originalURI));
-                    if (positionIndex.get() != -1) {
-                        cssURIs.remove(originalURI);
-                    }
-                    if (positionIndex.get() == -1) {
-                        positionIndex.set(cssURIs.indexOf(sourceURI));
-                    }
-                    cssURIs.remove(sourceURI);
-                };
-                Runnable adder = () -> {
-                    if (positionIndex.get() >= 0) {
-                        cssURIs.add(positionIndex.get(), sourceURI);
-                    } else {
-                        cssURIs.add(sourceURI);
+                Runnable task = () -> {
+                    int counter = 0;
+                    while(counter < cssURIs.size()) {
+                        String v = cssURIs.get(counter);
+                        if(v == originalURI || v == sourceURI) {
+                            cssURIs.remove(counter);
+                            cssURIs.add(counter, sourceURI);
+                        }
+                        counter += 1;
                     }
                 };
                 if (Platform.isFxApplicationThread()) {
-                    remover.run();
-                    adder.run();
+                    task.run();
                 } else {
-                    Platform.runLater(remover);
-                    Platform.runLater(adder);
+                    Platform.runLater(task);
                 }
             }
         }

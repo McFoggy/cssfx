@@ -24,12 +24,17 @@ import de.sandec.jmemorybuddy.JMemoryBuddy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.fxmisc.cssfx.api.URIToPathConverter;
 import org.fxmisc.cssfx.impl.CSSFXMonitor;
+import org.fxmisc.cssfx.impl.URIToPathConverters;
 import org.fxmisc.cssfx.impl.log.CSSFXLogger;
 import org.fxmisc.cssfx.impl.monitoring.CleanupDetector;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -62,4 +67,34 @@ public class TestCSSFXMonitor {
         });
         latch.await(1, TimeUnit.SECONDS);
     }
+
+    private final Set<URIToPathConverter> converters = new LinkedHashSet<URIToPathConverter>(Arrays.asList(URIToPathConverters.DEFAULT_CONVERTERS));
+
+    @Test
+    public void testAddingTwice() throws Exception {
+        CountDownLatch latch2 = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread thread, Throwable throwable) {
+                    throw new RuntimeException(throwable);
+                }
+            });
+            ObservableList<String> list = FXCollections.observableArrayList();
+            String uri = getClass().getResource("bottom.css").toExternalForm();
+
+            list.add(uri);
+            CSSFXMonitor monitor = new CSSFXMonitor();
+            monitor.addAllConverters(converters);
+            monitor.start();
+            monitor.monitorStylesheets(list);
+            list.add(uri);
+            list.add(uri);
+            latch2.countDown();
+        });
+        if(!latch2.await(1, TimeUnit.SECONDS)) {
+            throw new Exception("Test Failed!");
+        }
+    }
+
 }
