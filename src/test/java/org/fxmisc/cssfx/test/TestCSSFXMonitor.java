@@ -97,4 +97,34 @@ public class TestCSSFXMonitor {
         }
     }
 
+    @Test
+    public void testClasspathResource() throws Exception {
+        ObservableList<String> list = FXCollections.observableArrayList();
+        CountDownLatch latch2 = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread thread, Throwable throwable) {
+                    throw new RuntimeException(throwable);
+                }
+            });
+            String uri = getClass().getResource("bottom.css").toExternalForm();
+            CSSFXMonitor monitor = new CSSFXMonitor();
+            monitor.addAllConverters(converters);
+            monitor.start();
+            monitor.monitorStylesheets(list);
+            list.add(uri);
+            list.add("/org/fxmisc/cssfx/test/bottom.css");
+
+            System.out.println("list: " + list);
+            latch2.countDown();
+        });
+        if(!latch2.await(1, TimeUnit.SECONDS)) {
+            throw new Exception("Test Failed!");
+        }
+        if(!list.get(0).equals(list.get(1))) {
+            throw new RuntimeException("ClassPath wasn't properly converted to URI");
+        }
+    }
+
 }

@@ -24,6 +24,8 @@ package org.fxmisc.cssfx.impl;
 import static org.fxmisc.cssfx.impl.log.CSSFXLogger.logger;
 
 import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -352,11 +355,37 @@ public class CSSFXMonitor {
             this.wp = wp;
         }
 
+        // The logic of this method was taken from the class javafx.scene.image.Image
+        private static final Pattern URL_QUICKMATCH = Pattern.compile("^\\p{Alpha}[\\p{Alnum}+.-]*:.*$");
+        private String classpathToURI(String str) {
+            if (!URL_QUICKMATCH.matcher(str).matches()) {
+                final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+                URL resource;
+                if (str.charAt(0) == '/') {
+                    resource = contextClassLoader.getResource(str.substring(1));
+                } else {
+                    resource = contextClassLoader.getResource(str);
+                }
+                if(resource != null) {
+                    return resource.toString();
+                } else {
+                    return str;
+                }
+            }
+            try {
+                return new URL(str).toString();
+            } catch (MalformedURLException e) {
+                return str;
+            }
+        }
+
         public void register(String uri, ObservableList<? extends String> stylesheets) {
             if (!sourceURIs.containsKey(uri)) {
+                String simplifiedURI = classpathToURI(uri);
+
                 logger(CSSFXMonitor.class).debug("searching source for css[%s]", uri);
                 for (URIToPathConverter c : converters) {
-                    Path sourceFile = c.convert(uri);
+                    Path sourceFile = c.convert(simplifiedURI);
                     List<Runnable> runnables = new LinkedList<>();
                     if (sourceFile != null) {
                         logger(CSSFXMonitor.class).info("css[%s] will be mapped to source[%s]", uri, sourceFile);
