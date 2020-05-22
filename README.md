@@ -31,6 +31,17 @@ dependencies {
     compile "org.fxmisc.cssfx:cssfx:11.1.0"
 }
 ```
+__Modular Java__
+
+CSSFX does not currently provide a module descriptor.  
+If you wish to use cssfx from a modular javafx application you will need to require it as an automatic module
+```java
+// module-info.java 
+module your.module.name {
+  requires cssfx; // this is the automatic-module-name for CSSFX
+  ...
+}
+```
 
 ## Java 8
 
