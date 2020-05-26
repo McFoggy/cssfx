@@ -1,6 +1,6 @@
 cssfx
 =====
-[![Build Status](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/fr.brouillard.oss.cssfx/cssfx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/fr.brouillard.oss.cssfx/cssfx) [![Open Hub project report for CSSFX](https://www.openhub.net/p/cssfx/widgets/project_thin_badge.gif)](https://www.openhub.net/p/cssfx?ref=sample)
+[![Build Status](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/fr.brouillard.oss/cssfx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/fr.brouillard.oss/cssfx) [![Open Hub project report for CSSFX](https://www.openhub.net/p/cssfx/widgets/project_thin_badge.gif)](https://www.openhub.net/p/cssfx?ref=sample)
 
 > ⚠ WARNING ⚠   
 >
