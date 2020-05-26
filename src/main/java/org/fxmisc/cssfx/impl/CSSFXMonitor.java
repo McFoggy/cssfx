@@ -466,18 +466,17 @@ public class CSSFXMonitor {
                     int counter = 0;
                     while(counter < cssURIs.size()) {
                         String v = cssURIs.get(counter);
-                        if(v == originalURI || v == sourceURI) {
+                        if(v.equals(originalURI) || v.equals(sourceURI)) {
                             cssURIs.remove(counter);
                             cssURIs.add(counter, sourceURI);
                         }
                         counter += 1;
                     }
                 };
-                if (Platform.isFxApplicationThread()) {
-                    task.run();
-                } else {
-                    Platform.runLater(task);
-                }
+                // It's important that we are using runLater even when we are using the JavaFX Thread.
+                // This way we make sure we are currently not running the ChangeListener
+                // which would result in an Exception.
+                Platform.runLater(task);
             }
         }
     }

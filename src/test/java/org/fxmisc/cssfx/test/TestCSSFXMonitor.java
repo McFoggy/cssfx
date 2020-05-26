@@ -74,25 +74,29 @@ public class TestCSSFXMonitor {
     public void testAddingTwice() throws Exception {
         CountDownLatch latch2 = new CountDownLatch(1);
         Platform.runLater(() -> {
-            Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread thread, Throwable throwable) {
-                    throw new RuntimeException(throwable);
-                }
-            });
-            ObservableList<String> list = FXCollections.observableArrayList();
-            String uri = getClass().getResource("bottom.css").toExternalForm();
+            try {
+                Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    @Override
+                    public void uncaughtException(Thread thread, Throwable throwable) {
+                        throw new RuntimeException(throwable);
+                    }
+                });
+                ObservableList<String> list = FXCollections.observableArrayList();
+                String uri = getClass().getResource("bottom.css").toExternalForm();
 
-            list.add(uri);
-            CSSFXMonitor monitor = new CSSFXMonitor();
-            monitor.addAllConverters(converters);
-            monitor.start();
-            monitor.monitorStylesheets(list);
-            list.add(uri);
-            list.add(uri);
-            latch2.countDown();
+                list.add(uri);
+                CSSFXMonitor monitor = new CSSFXMonitor();
+                monitor.addAllConverters(converters);
+                monitor.start();
+                monitor.monitorStylesheets(list);
+                list.add(uri);
+                list.add(uri);
+                latch2.countDown();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
-        if(!latch2.await(1, TimeUnit.SECONDS)) {
+        if(!latch2.await(100, TimeUnit.SECONDS)) {
             throw new Exception("Test Failed!");
         }
     }
@@ -102,26 +106,35 @@ public class TestCSSFXMonitor {
         ObservableList<String> list = FXCollections.observableArrayList();
         CountDownLatch latch2 = new CountDownLatch(1);
         Platform.runLater(() -> {
-            Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread thread, Throwable throwable) {
-                    throw new RuntimeException(throwable);
-                }
-            });
-            String uri = getClass().getResource("bottom.css").toExternalForm();
-            CSSFXMonitor monitor = new CSSFXMonitor();
-            monitor.addAllConverters(converters);
-            monitor.start();
-            monitor.monitorStylesheets(list);
-            list.add(uri);
-            list.add("/org/fxmisc/cssfx/test/bottom.css");
+            try {
+                Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    @Override
+                    public void uncaughtException(Thread thread, Throwable throwable) {
+                        throw new RuntimeException(throwable);
+                    }
+                });
+                String uri = getClass().getResource("bottom.css").toExternalForm();
+                CSSFXMonitor monitor = new CSSFXMonitor();
+                monitor.addAllConverters(converters);
+                monitor.start();
+                monitor.monitorStylesheets(list);
+                list.add(uri);
+                list.add("/org/fxmisc/cssfx/test/bottom.css");
 
-            System.out.println("list: " + list);
-            latch2.countDown();
+                System.out.println("list: " + list);
+                latch2.countDown();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            }
         });
         if(!latch2.await(1, TimeUnit.SECONDS)) {
             throw new Exception("Test Failed!");
         }
+        // We have to wait another time, because we have to wait for another scheduled runLater.
+        CountDownLatch latch3 = new CountDownLatch(1);
+        Platform.runLater(() -> latch3.countDown());
+        latch3.await(1, TimeUnit.SECONDS);
         if(!list.get(0).equals(list.get(1))) {
             throw new RuntimeException("ClassPath wasn't properly converted to URI");
         }
