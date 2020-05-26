@@ -24,12 +24,17 @@ import de.sandec.jmemorybuddy.JMemoryBuddy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.fxmisc.cssfx.api.URIToPathConverter;
 import org.fxmisc.cssfx.impl.CSSFXMonitor;
+import org.fxmisc.cssfx.impl.URIToPathConverters;
 import org.fxmisc.cssfx.impl.log.CSSFXLogger;
 import org.fxmisc.cssfx.impl.monitoring.CleanupDetector;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -62,4 +67,77 @@ public class TestCSSFXMonitor {
         });
         latch.await(1, TimeUnit.SECONDS);
     }
+
+    private final Set<URIToPathConverter> converters = new LinkedHashSet<URIToPathConverter>(Arrays.asList(URIToPathConverters.DEFAULT_CONVERTERS));
+
+    @Test
+    public void testAddingTwice() throws Exception {
+        CountDownLatch latch2 = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    @Override
+                    public void uncaughtException(Thread thread, Throwable throwable) {
+                        throw new RuntimeException(throwable);
+                    }
+                });
+                ObservableList<String> list = FXCollections.observableArrayList();
+                String uri = getClass().getResource("bottom.css").toExternalForm();
+
+                list.add(uri);
+                CSSFXMonitor monitor = new CSSFXMonitor();
+                monitor.addAllConverters(converters);
+                monitor.start();
+                monitor.monitorStylesheets(list);
+                list.add(uri);
+                list.add(uri);
+                latch2.countDown();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        if(!latch2.await(100, TimeUnit.SECONDS)) {
+            throw new Exception("Test Failed!");
+        }
+    }
+
+    @Test
+    public void testClasspathResource() throws Exception {
+        ObservableList<String> list = FXCollections.observableArrayList();
+        CountDownLatch latch2 = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    @Override
+                    public void uncaughtException(Thread thread, Throwable throwable) {
+                        throw new RuntimeException(throwable);
+                    }
+                });
+                String uri = getClass().getResource("bottom.css").toExternalForm();
+                CSSFXMonitor monitor = new CSSFXMonitor();
+                monitor.addAllConverters(converters);
+                monitor.start();
+                monitor.monitorStylesheets(list);
+                list.add(uri);
+                list.add("/org/fxmisc/cssfx/test/bottom.css");
+
+                System.out.println("list: " + list);
+                latch2.countDown();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            }
+        });
+        if(!latch2.await(1, TimeUnit.SECONDS)) {
+            throw new Exception("Test Failed!");
+        }
+        // We have to wait another time, because we have to wait for another scheduled runLater.
+        CountDownLatch latch3 = new CountDownLatch(1);
+        Platform.runLater(() -> latch3.countDown());
+        latch3.await(1, TimeUnit.SECONDS);
+        if(!list.get(0).equals(list.get(1))) {
+            throw new RuntimeException("ClassPath wasn't properly converted to URI");
+        }
+    }
+
 }
