@@ -1,6 +1,15 @@
 cssfx
 =====
-[![Build Status](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.cssfx/cssfx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.cssfx/cssfx) [![Open Hub project report for CSSFX](https://www.openhub.net/p/cssfx/widgets/project_thin_badge.gif)](https://www.openhub.net/p/cssfx?ref=sample)
+[![Build Status](https://travis-ci.org/McFoggy/cssfx.svg?branch=master)](https://travis-ci.org/McFoggy/cssfx) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/fr.brouillard.oss.cssfx/cssfx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/fr.brouillard.oss.cssfx/cssfx) [![Open Hub project report for CSSFX](https://www.openhub.net/p/cssfx/widgets/project_thin_badge.gif)](https://www.openhub.net/p/cssfx?ref=sample)
+
+> ⚠ WARNING ⚠   
+>
+> In version `11.3` we have relocated & refactored the project.
+> * maven `GroupId` has been changed to `fr.brouillard.oss`
+> * java module name has been changed from `cssfx` to `fr.brouillard.oss.cssfx`
+> * classes package has been changed from `org.fxmisc.cssfx` to `fr.brouillard.oss.cssfx` 
+>
+> ⚠ WARNING ⚠   
 
 CSSFX enhances developper productivity by providing CSS reloading functionnality in your running application.
 
@@ -12,15 +21,15 @@ While developping you can run your JavaFX application, modify some CSS sources i
 
 ## Java >= 11
 
-Versions compatible with JavaFX 11 start with `11.X` (see [latest on central](https://search.maven.org/search?q=g:org.fxmisc.cssfx%20AND%20a:cssfx))
+Versions compatible with JavaFX 11 start with `11.X` (see [latest on central](https://search.maven.org/search?q=g:fr.brouillard.oss%20AND%20a:cssfx))
 
 __Maven__
 
 ```
 <dependency>
-  <groupId>org.fxmisc.cssfx</groupId>
+  <groupId>fr.brouillard.oss</groupId>
   <artifactId>cssfx</artifactId>
-  <version>11.2.2</version>
+  <version>11.3</version>
 </dependency>
 ```
 
@@ -28,18 +37,17 @@ __Gradle__
 
 ```
 dependencies {
-    compile "org.fxmisc.cssfx:cssfx:11.2.2"
+    compile "fr.brouillard.oss:cssfx:11.3"
 }
 ```
 __Modular Java__
 
-CSSFX does not currently provide a module descriptor.  
+CSSFX does not currently provide a module descriptor but it defines the its module name `fr.brouillard.oss.cssfx`.  
 If you wish to use cssfx from a modular javafx application you will need to require it as an automatic module
 ```java
 // module-info.java 
 module your.module.name {
-  requires cssfx; // this is the automatic-module-name for CSSFX
-  ...
+  requires fr.brouillard.oss.cssfx;
 }
 ```
 
@@ -180,4 +188,4 @@ Many thanks to the [JPro](https://www.jpro.one/) company which actively supports
 
 Also, a big _thank you_ to all [contributors](https://github.com/McFoggy/cssfx/graphs/contributors) and people who reported issues or enhancement requests ; an OSS project is nothing without its users and community.
 
-Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central.  
+Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central prior to version `11.3`.  

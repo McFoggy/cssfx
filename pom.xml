@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.fxmisc.cssfx</groupId>
+    <groupId>fr.brouillard.oss</groupId>
     <artifactId>cssfx</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>CSSFX</name>
-    <url>http://www.fxmisc.org/cssfx</url>
+    <url>https://github.com/mcfoggy/cssfx</url>
     <description>CSSFX enhances developper productivity by offering hot-reloading of CSS in running applications</description>
 
     <issueManagement>
@@ -86,6 +86,14 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
+                        <manifestEntries>
+                            <Automatic-Module-Name>fr.brouillard.oss.cssfx</Automatic-Module-Name>
+                            <X-Maven-Coordinates>${project.groupId}:${project.artifactId}:${project.version}</X-Maven-Coordinates>
+                            <X-Git-CommitId>${jgitver.git_sha1_full}</X-Git-CommitId>
+                            <X-Git-Branch>${jgitver.branch_name}</X-Git-Branch>
+                            <X-Git-Dirty>${jgitver.dirty}</X-Git-Dirty>
+                            <X-Project-Home>https://github.com/mcfoggy/cssfx</X-Project-Home>
+                        </manifestEntries>
                     </archive>
                 </configuration>
                 <executions>
