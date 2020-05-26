@@ -165,6 +165,8 @@ CSSFXLogger.setLoggerFactory((loggerName) -> (level, message, args) -> {
 
 ## Credits
 
-Thanks to all [contributors](https://github.com/McFoggy/cssfx/graphs/contributors) and people who reported issues or enhancement requests.
+Many thanks to the [JPro](https://www.jpro.one/) company which actively supports [cssfx](https://github.com/McFoggy/cssfx) and promotes its usage.  
+
+Also, a big _thank you_ to all [contributors](https://github.com/McFoggy/cssfx/graphs/contributors) and people who reported issues or enhancement requests ; an OSS project is nothing without its users and community.
 
 Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central.  
