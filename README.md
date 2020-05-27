@@ -5,15 +5,15 @@ cssfx
 > ⚠ WARNING ⚠   
 >
 > In version `11.3` we have relocated & refactored the project.
-> * maven `GroupId` has been changed to `fr.brouillard.oss`
+> * maven `groupId` has been changed to `fr.brouillard.oss`
 > * java module name has been changed from `cssfx` to `fr.brouillard.oss.cssfx`
 > * classes package has been changed from `org.fxmisc.cssfx` to `fr.brouillard.oss.cssfx` 
 >
 > ⚠ WARNING ⚠   
 
-CSSFX enhances developper productivity by providing CSS reloading functionnality in your running application.
+CSSFX enhances developer productivity by providing CSS reloading functionality in your running application.
 
-While developping you can run your JavaFX application, modify some CSS sources in your prefered editor, hit save button (or CTLR+S or CMD-S) and your JavaFX application is modified in real time.
+While developing you can run your JavaFX application, modify some CSS sources in your preferred editor, hit save button (or CTLR+S or CMD-S) and your JavaFX application is modified in real time.
 
 [![CSSFX YouTube demo](http://img.youtube.com/vi/RELKg32xEWU/0.jpg)](http://www.youtube.com/watch?v=RELKg32xEWU)
 
@@ -21,7 +21,8 @@ While developping you can run your JavaFX application, modify some CSS sources i
 
 ## Java >= 11
 
-Versions compatible with JavaFX 11 start with `11.X` (see [latest on central](https://search.maven.org/search?q=g:fr.brouillard.oss%20AND%20a:cssfx))
+Versions compatible with JavaFX 11 start with `11.X`.  
+Find [latest version on central](https://search.maven.org/search?q=g:fr.brouillard.oss%20AND%20a:cssfx) or [old ones](https://search.maven.org/search?q=g:org.fxmisc.cssfx%20AND%20a:cssfx) before relocation.
 
 __Maven__
 
@@ -42,8 +43,8 @@ dependencies {
 ```
 __Modular Java__
 
-CSSFX does not currently provide a module descriptor but it defines the its module name `fr.brouillard.oss.cssfx`.  
-If you wish to use cssfx from a modular javafx application you will need to require it as an automatic module
+CSSFX does not currently provide a module descriptor, but it defines its module name `fr.brouillard.oss.cssfx`.  
+If you wish to use CSSFX from a modular javafx application you will need to require it for the moment as an automatic module.
 ```java
 // module-info.java 
 module your.module.name {
