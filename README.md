@@ -4,7 +4,7 @@ cssfx
 
 > ⚠ WARNING ⚠   
 >
-> In version `11.3` we have relocated & refactored the project.
+> In version `11.3.0` we have relocated & refactored the project.
 > * maven `groupId` has been changed to `fr.brouillard.oss`
 > * java module name has been changed from `cssfx` to `fr.brouillard.oss.cssfx`
 > * classes package has been changed from `org.fxmisc.cssfx` to `fr.brouillard.oss.cssfx` 
@@ -30,7 +30,7 @@ __Maven__
 <dependency>
   <groupId>fr.brouillard.oss</groupId>
   <artifactId>cssfx</artifactId>
-  <version>11.3</version>
+  <version>11.3.0</version>
 </dependency>
 ```
 
@@ -38,7 +38,7 @@ __Gradle__
 
 ```
 dependencies {
-    compile "fr.brouillard.oss:cssfx:11.3"
+    compile "fr.brouillard.oss:cssfx:11.3.0"
 }
 ```
 __Modular Java__
@@ -189,4 +189,4 @@ Many thanks to the [JPro](https://www.jpro.one/) company which actively supports
 
 Also, a big _thank you_ to all [contributors](https://github.com/McFoggy/cssfx/graphs/contributors) and people who reported issues or enhancement requests ; an OSS project is nothing without its users and community.
 
-Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central prior to version `11.3`.  
+Special thanks to [Tomas Mikula](https://github.com/TomasMikula) and his [FXMisc](http://www.fxmisc.org/) project umbrella that have simplified the route of CSSFX to maven central prior to version `11.3.0`.  
