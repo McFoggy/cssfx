@@ -161,11 +161,6 @@ public class CSSFXMonitor {
             @Override
             public void onChanged(javafx.collections.ListChangeListener.Change<? extends Window> c) {
                 while (c.next()) {
-                    if (c.wasRemoved()) {
-                        for (Window removedWindow : c.getRemoved()) {
-                            unregisterWindow(removedWindow);
-                        }
-                    }
                     if (c.wasAdded()) {
                         for (Window addedWindow : c.getAddedSubList()) {
                             registerWindow(addedWindow);
@@ -187,9 +182,6 @@ public class CSSFXMonitor {
         stageSceneProperty.addListener(new ChangeListener<Scene>() {
             @Override
             public void changed(ObservableValue<? extends Scene> ov, Scene o, Scene n) {
-                if (o != null) {
-                    unregisterScene(o);
-                }
                 if (n != null) {
                     registerScene(n);
                 }
@@ -204,9 +196,6 @@ public class CSSFXMonitor {
     private void monitorRoot(ObjectProperty<Parent> rootProperty) {
         // register on modification
         rootProperty.addListener((ov, o, n) -> {
-            if (o != null) {
-                unregisterNode(o);
-            }
             if (n != null) {
                 registerNode(n);
             }
@@ -215,12 +204,6 @@ public class CSSFXMonitor {
         // check current value
         if (rootProperty.getValue() != null) {
             registerNode(rootProperty.getValue());
-        }
-    }
-
-    private void unregisterNode(Node removedNode) {
-        if (knownNodes.remove(removedNode)) {
-            eventNotify(CSSFXEvent.newEvent(EventType.NODE_REMOVED, removedNode));
         }
     }
 
@@ -241,11 +224,6 @@ public class CSSFXMonitor {
             @Override
             public void onChanged(javafx.collections.ListChangeListener.Change<? extends Scene> c) {
                 while (c.next()) {
-                    if (c.wasRemoved()) {
-                        for (Scene removedScene : c.getRemoved()) {
-                            unregisterScene(removedScene);
-                        }
-                    }
                     if (c.wasAdded()) {
                         for (Scene addedScene : c.getAddedSubList()) {
                             registerScene(addedScene);
@@ -267,11 +245,6 @@ public class CSSFXMonitor {
             @Override
             public void onChanged(javafx.collections.ListChangeListener.Change<? extends Node> c) {
                 while (c.next()) {
-                    if (c.wasRemoved()) {
-                        for (Node removedNode : c.getRemoved()) {
-                            unregisterNode(removedNode);
-                        }
-                    }
                     if (c.wasAdded()) {
                         for (Node addedNode : c.getAddedSubList()) {
                             registerNode(addedNode);
@@ -316,25 +289,10 @@ public class CSSFXMonitor {
         }
     }
 
-    private void unregisterScene(Scene removedScene) {
-        if (knownScenes.remove(removedScene)) {
-            eventNotify(CSSFXEvent.newEvent(EventType.SCENE_REMOVED, removedScene));
-        }
-    }
-
     private void registerWindow(Window stage) {
         if (knownWindows.add(stage)) {
             eventNotify(CSSFXEvent.newEvent(EventType.STAGE_ADDED, stage));
             monitorStageScene(stage.sceneProperty());
-        }
-    }
-
-    private void unregisterWindow(Window removedStage) {
-        if (knownWindows.remove(removedStage)) {
-            if (removedStage.getScene() != null) {
-                unregisterScene(removedStage.getScene());
-            }
-            eventNotify(CSSFXEvent.newEvent(EventType.STAGE_REMOVED, removedStage));
         }
     }
 
