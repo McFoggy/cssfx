@@ -30,7 +30,7 @@ __Maven__
 <dependency>
   <groupId>fr.brouillard.oss</groupId>
   <artifactId>cssfx</artifactId>
-  <version>11.3.0</version>
+  <version>11.4.0</version>
 </dependency>
 ```
 
@@ -38,7 +38,7 @@ __Gradle__
 
 ```
 dependencies {
-    compile "fr.brouillard.oss:cssfx:11.3.0"
+    compile "fr.brouillard.oss:cssfx:11.4.0"
 }
 ```
 __Modular Java__
